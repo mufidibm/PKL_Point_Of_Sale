@@ -9,7 +9,7 @@ return new class extends Migration {
         Schema::create('produks', function (Blueprint $table) {
             $table->id();
             $table->string('nama_produk');
-            $table->string('barcode')->unique();
+            $table->string('barcode')->unique()->nullable();
             $table->decimal('harga_beli', 12, 2);
             $table->decimal('harga_jual', 12, 2);
             $table->string('satuan')->default('pcs');
