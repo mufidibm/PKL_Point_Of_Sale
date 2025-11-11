@@ -16,6 +16,6 @@ class Gudang extends Model
     // Relationships
     public function stokGudang()
     {
-        return $this->hasMany(StokGudang::class);
+        return $this->hasMany(StokGudang::class, 'gudang_id');
     }
 }
