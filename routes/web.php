@@ -16,6 +16,8 @@ use App\Http\Controllers\ReturPembelianController;
 use App\Http\Controllers\MembershipController;
 use App\Http\Controllers\LaporanController;
 
+
+
 Auth::routes(); // route bawaan laravel/ui (login, register, dll)
 
 // ✅ Dashboard (default setelah login)
@@ -43,3 +45,18 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('retur-penjualan', ReturPenjualanController::class);
     Route::resource('retur-pembelian', ReturPembelianController::class);
 });
+
+//pelanggan
+Route::resource('pelanggan', PelangganController::class);
+
+//Gudang
+Route::resource('gudang', GudangController::class);
+
+//Stok gudang
+Route::resource('stokgudang', StokController::class);
+
+//Karyawan
+Route::resource('karyawan', KaryawanController::class);
+
+//Membership
+Route::resource('membership', MembershipController::class);

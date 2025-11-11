@@ -23,12 +23,12 @@ class StokGudang extends Model
     // Relationships
     public function produk()
     {
-        return $this->belongsTo(Produk::class);
+        return $this->belongsTo(Produk::class, 'produk_id');
     }
 
     public function gudang()
     {
-        return $this->belongsTo(Gudang::class);
+    return $this->belongsTo(Gudang::class, 'gudang_id');
     }
 
     // Auto update timestamp
