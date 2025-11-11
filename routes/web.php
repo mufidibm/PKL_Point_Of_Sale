@@ -64,3 +64,9 @@ Route::resource('membership', MembershipController::class);
 //Laporan
 Route::get('/laporan', [LaporanController::class, 'index'])->name('laporan.index');
 Route::get('/laporan/export/{type}', [LaporanController::class, 'export'])->name('laporan.export');
+
+//transaksi
+Route::prefix('transaksi')->name('transaksi.')->group(function () {
+    Route::resource('penjualan', TransaksiPenjualanController::class);
+    Route::resource('pembelian', TransaksiPembelianController::class);
+});
