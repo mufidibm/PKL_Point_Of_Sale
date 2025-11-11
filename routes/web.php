@@ -60,3 +60,7 @@ Route::resource('karyawan', KaryawanController::class);
 
 //Membership
 Route::resource('membership', MembershipController::class);
+
+//Laporan
+Route::get('/laporan', [LaporanController::class, 'index'])->name('laporan.index');
+Route::get('/laporan/export/{type}', [LaporanController::class, 'export'])->name('laporan.export');
