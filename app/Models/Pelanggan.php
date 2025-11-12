@@ -18,7 +18,7 @@ class Pelanggan extends Model
     // Relationships
     public function membership()
     {
-        return $this->belongsTo(Membership::class);
+        return $this->belongsTo(Membership::class, 'membership_id');
     }
 
     public function transaksiPenjualan()

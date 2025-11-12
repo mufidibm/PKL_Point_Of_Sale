@@ -20,7 +20,7 @@ class TransaksiPenjualan extends Model
     ];
 
     protected $casts = [
-        'tanggal' => 'date',
+        'tanggal' => 'datetime',
         'subtotal' => 'decimal:2',
         'diskon' => 'decimal:2',
         'total_bayar' => 'decimal:2',

@@ -59,7 +59,7 @@ class LaporanController extends Controller
     {
         $mulai = $request->tanggal_mulai;
         $selesai = $request->tanggal_selesai;
-        $format = $request->format; // pdf atau excel
+        $format = $request->input('format'); // pdf atau excel
 
         $data = $type === 'penjualan'
             ? $this->getPenjualan($mulai, $selesai)
@@ -82,7 +82,7 @@ class LaporanController extends Controller
                 $sheet->fromArray([
                     $i + 1,
                     $t->no_invoice,
-                    $t->tanggal->format('d/m/Y'),
+                    $t->tanggal->format('d/M/Y'),
                     $t->pelanggan?->nama ?? '-',
                     $t->subtotal,
                     $t->diskon,

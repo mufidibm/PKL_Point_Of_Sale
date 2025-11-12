@@ -26,7 +26,7 @@ class PelangganController extends Controller
             'nama' => 'required|string|max:255',
             'no_telepon' => 'required|string|max:15',
             'alamat' => 'required|string',
-            'membership_id' => 'nullable|exists:membership,id',
+            'membership_id' => 'nullable|exists:memberships,id',
         ]);
 
         Pelanggan::create($request->all());
@@ -47,7 +47,7 @@ class PelangganController extends Controller
             'nama' => 'required|string|max:255',
             'no_telepon' => 'required|string|max:15',
             'alamat' => 'required|string',
-            'membership_id' => 'nullable|exists:membership,id',
+            'membership_id' => 'nullable|exists:memberships,id',
         ]);
 
         $pelanggan->update($request->all());

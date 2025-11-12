@@ -25,8 +25,8 @@ class StokController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'produk_id'   => 'required|exists:produk,id',
-            'gudang_id'   => 'required|exists:gudang,id',
+            'produk_id'   => 'required|exists:produks,id',
+            'gudang_id'   => 'required|exists:gudangs,id',
             'jumlah_stok' => 'required|integer|min:0',
         ]);
 

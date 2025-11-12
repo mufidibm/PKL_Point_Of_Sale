@@ -17,7 +17,7 @@ class TransaksiPembelian extends Model
     ];
 
     protected $casts = [
-        'tanggal' => 'date',
+        'tanggal' => 'datetime',
         'total_biaya' => 'decimal:2',
     ];
 
