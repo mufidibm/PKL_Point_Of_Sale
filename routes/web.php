@@ -16,9 +16,7 @@ use App\Http\Controllers\ReturPembelianController;
 use App\Http\Controllers\MembershipController;
 use App\Http\Controllers\LaporanController;
 use App\Http\Controllers\KasirController;
-
-
-
+use App\Http\Controllers\UserController;
 
 Auth::routes(); // route bawaan laravel/ui (login, register, dll)
 
@@ -26,8 +24,10 @@ Auth::routes(); // route bawaan laravel/ui (login, register, dll)
 Route::get('/', [DashboardController::class, 'index'])->name('dashboard')->middleware('auth');
 
 // ✅ Group route admin (harus login)
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth', 'role:admin'])->group(function () {
 
+    // Tambahkan ini di dalam group middleware auth
+    Route::resource('user', UserController::class);
     // Master Data
     Route::resource('produk', ProdukController::class);
     Route::resource('kategori', KategoriController::class);
@@ -74,7 +74,7 @@ Route::prefix('transaksi')->name('transaksi.')->group(function () {
 });
 
 
-Route::prefix('pos')->group(function() {
+Route::prefix('pos')->group(function () {
     Route::get('/kasir', [KasirController::class, 'index'])->name('pos.index');
     Route::get('/cari-produk', [KasirController::class, 'cariProduk']);
     Route::get('/cari-membership', [KasirController::class, 'cariMembership']);
