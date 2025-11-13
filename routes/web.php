@@ -15,6 +15,8 @@ use App\Http\Controllers\ReturPenjualanController;
 use App\Http\Controllers\ReturPembelianController;
 use App\Http\Controllers\MembershipController;
 use App\Http\Controllers\LaporanController;
+use App\Http\Controllers\KasirController;
+
 
 
 
@@ -69,4 +71,13 @@ Route::get('/laporan/export/{type}', [LaporanController::class, 'export'])->name
 Route::prefix('transaksi')->name('transaksi.')->group(function () {
     Route::resource('penjualan', TransaksiPenjualanController::class);
     Route::resource('pembelian', TransaksiPembelianController::class);
+});
+
+
+Route::prefix('pos')->group(function() {
+    Route::get('/kasir', [KasirController::class, 'index'])->name('pos.index');
+    Route::get('/cari-produk', [KasirController::class, 'cariProduk']);
+    Route::get('/cari-membership', [KasirController::class, 'cariMembership']);
+    Route::post('/proses', [KasirController::class, 'prosesTransaksi']);
+    Route::get('/cetak-struk/{id}', [KasirController::class, 'cetakStruk']);
 });

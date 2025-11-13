@@ -21,7 +21,7 @@ class GudangController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'nama_gudang' => 'required|string|max:255|unique:gudang,nama_gudang',
+            'nama_gudang' => 'required|string|max:255|unique:gudangs,nama_gudang',
             'lokasi'      => 'required|string',
         ]);
 
