@@ -77,3 +77,17 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile/hapus-foto', [ProfileController::class, 'hapusFoto'])
         ->name('profile.hapus-foto');
 });
+
+// Tambahkan route ini di dalam group admin middleware
+Route::prefix('admin')->middleware(['auth'])->group(function () {
+    Route::resource('returpenjualan', ReturPenjualanController::class);
+    Route::get('returpenjualan/get-detail/{id}', [ReturPenjualanController::class, 'getDetailTransaksi']);
+    
+});
+
+// Tambahkan route ini di dalam group admin middleware
+Route::prefix('admin')->middleware(['auth'])->group(function () {
+    Route::resource('returpembelian', ReturPembelianController::class);
+    Route::get('returpembelian/get-detail/{id}', [ReturPembelianController::class, 'getDetailTransaksi']);
+    
+});
