@@ -1,64 +1,197 @@
-<section>
-    <header>
-        <h2 class="text-lg font-medium text-gray-900">
-            {{ __('Profile Information') }}
-        </h2>
+{{-- resources/views/profile/partials/update-profile-information-form.blade.php --}}
+<style>
+    .custom-file-upload {
+        display: inline-block;
+        padding: 8px 20px;
+        cursor: pointer;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        font-size: 14px;
+        font-weight: 500;
+        text-align: center;
+        box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+    }
+    
+    .custom-file-upload:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    }
+    
+    .custom-file-upload i {
+        margin-right: 8px;
+    }
+    
+    #foto_profil {
+        display: none;
+    }
+    
+    .file-name-display {
+        margin-top: 10px;
+        padding: 8px 12px;
+        background: #f8f9fa;
+        border-radius: 6px;
+        font-size: 13px;
+        color: #495057;
+        display: none;
+    }
+    
+    .file-name-display.show {
+        display: block;
+    }
+    
+    .file-name-display i {
+        color: #28a745;
+        margin-right: 6px;
+    }
+    
+    .profile-photo-section {
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+</style>
 
-        <p class="mt-1 text-sm text-gray-600">
-            {{ __("Update your account's profile information and email address.") }}
-        </p>
-    </header>
-
-    <form id="send-verification" method="post" action="{{ route('verification.send') }}">
-        @csrf
-    </form>
-
-    <form method="post" action="{{ route('profile.update') }}" class="mt-6 space-y-6">
-        @csrf
-        @method('patch')
-
-        <div>
-            <x-input-label for="name" :value="__('Name')" />
-            <x-text-input id="name" name="name" type="text" class="mt-1 block w-full" :value="old('name', $user->name)" required autofocus autocomplete="name" />
-            <x-input-error class="mt-2" :messages="$errors->get('name')" />
-        </div>
-
-        <div>
-            <x-input-label for="email" :value="__('Email')" />
-            <x-text-input id="email" name="email" type="email" class="mt-1 block w-full" :value="old('email', $user->email)" required autocomplete="username" />
-            <x-input-error class="mt-2" :messages="$errors->get('email')" />
-
-            @if ($user instanceof \Illuminate\Contracts\Auth\MustVerifyEmail && ! $user->hasVerifiedEmail())
-                <div>
-                    <p class="text-sm mt-2 text-gray-800">
-                        {{ __('Your email address is unverified.') }}
-
-                        <button form="send-verification" class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                            {{ __('Click here to re-send the verification email.') }}
-                        </button>
-                    </p>
-
-                    @if (session('status') === 'verification-link-sent')
-                        <p class="mt-2 font-medium text-sm text-green-600">
-                            {{ __('A new verification link has been sent to your email address.') }}
-                        </p>
-                    @endif
+<form method="post"
+      action="{{ route('profile.update') }}"
+      enctype="multipart/form-data"
+      class="mt-4">
+    @csrf
+    @method('patch')
+    <div class="row">
+        <!-- Foto Profil + Preview -->
+        <div class="col-md-4">
+            <div class="profile-photo-section text-center">
+                <img id="preview-foto"
+                     src="{{ auth()->user()->foto_profil_url }}"
+                     class="profile-user-img img-fluid img-circle elevation-2 mb-3"
+                     style="width: 150px; height: 150px; object-fit: cover;"
+                     alt="Foto Profil">
+                
+                <div class="form-group">
+                    <label for="foto_profil" class="custom-file-upload">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        Pilih Foto Baru
+                    </label>
+                    <input type="file"
+                           name="foto_profil"
+                           id="foto_profil"
+                           accept="image/*">
+                    
+                    <div id="file-name-display" class="file-name-display">
+                        <i class="fas fa-check-circle"></i>
+                        <span id="file-name-text"></span>
+                    </div>
+                    
+                    @error('foto_profil')
+                        <small class="text-danger d-block mt-2">{{ $message }}</small>
+                    @enderror
                 </div>
+                
+                @if(auth()->user()->foto_profil)
+                <button type="button"
+                        onclick="hapusFoto()"
+                        class="btn btn-danger btn-sm mt-2">
+                    <i class="fas fa-trash"></i> Hapus Foto
+                </button>
+                @endif
+            </div>
+        </div>
+        
+        <!-- Form Nama & Email -->
+        <div class="col-md-8">
+            <div class="form-group">
+                <label>Nama Lengkap</label>
+                <input type="text"
+                       name="name"
+                       value="{{ old('name', auth()->user()->name) }}"
+                       class="form-control @error('name') is-invalid @enderror"
+                       required
+                       autofocus>
+                @error('name')
+                    <span class="invalid-feedback">{{ $message }}</span>
+                @enderror
+            </div>
+            
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email"
+                       name="email"
+                       value="{{ old('email', auth()->user()->email) }}"
+                       class="form-control @error('email') is-invalid @enderror"
+                       required>
+                @error('email')
+                    <span class="invalid-feedback">{{ $message }}</span>
+                @enderror
+            </div>
+           
+            <div class="form-group">
+                <label>Role</label>
+                <input value="{{ old('role', auth()->user()->role) }}"
+                       class="form-control"
+                       readonly>
+            </div>
+            
+            <button type="submit"
+                    class="btn btn-primary">
+                <i class="fas fa-save"></i> Simpan Perubahan
+            </button>
+            
+            @if(session('status') === 'profile-updated')
+                <span class="text-success ml-3">
+                    <i class="fas fa-check"></i> Profil berhasil diperbarui!
+                </span>
             @endif
         </div>
+    </div>
+</form>
 
-        <div class="flex items-center gap-4">
-            <x-primary-button>{{ __('Save') }}</x-primary-button>
-
-            @if (session('status') === 'profile-updated')
-                <p
-                    x-data="{ show: true }"
-                    x-show="show"
-                    x-transition
-                    x-init="setTimeout(() => show = false, 2000)"
-                    class="text-sm text-gray-600"
-                >{{ __('Saved.') }}</p>
-            @endif
-        </div>
-    </form>
-</section>
+<script>
+    // Live preview foto dan tampilkan nama file
+    document.getElementById('foto_profil').addEventListener('change', function (e) {
+        const file = e.target.files[0];
+        const fileNameDisplay = document.getElementById('file-name-display');
+        const fileNameText = document.getElementById('file-name-text');
+        
+        if (file) {
+            // Preview foto
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                document.getElementById('preview-foto').src = e.target.result;
+            }
+            reader.readAsDataURL(file);
+            
+            // Tampilkan nama file
+            fileNameText.textContent = file.name;
+            fileNameDisplay.classList.add('show');
+        } else {
+            fileNameDisplay.classList.remove('show');
+        }
+    });
+    
+    // Hapus foto
+    function hapusFoto() {
+        if (!confirm('Yakin ingin menghapus foto profil?')) return;
+        
+        fetch('{{ route('profile.hapus-foto') }}', {
+            method: 'DELETE',
+            headers: {
+                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                'Accept': 'application/json'
+            }
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                document.getElementById('preview-foto').src = '{{ asset('adminlte/dist/img/user2-160x160.jpg') }}';
+                location.reload();
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Terjadi kesalahan saat menghapus foto');
+        });
+    }
+</script>

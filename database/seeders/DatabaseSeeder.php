@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Faker\Factory as Faker;
@@ -64,6 +65,34 @@ class DatabaseSeeder extends Seeder
         }
 
         // 4. User & Karyawan (admin, kasir, gudang, owner)
+        User::create([
+            'name' => 'q',
+            'email' => 'q@gmail.com',
+            'password' => bcrypt('12345678'),
+            'role' => 'admin',
+        ]);
+        
+        User::create([
+            'name' => 'w',
+            'email' => 'w@gmail.com',
+            'password' => bcrypt('12345678'),
+            'role' => 'kasir',
+        ]);
+        
+        User::create([
+            'name' => 'a',
+            'email' => 'a@gmail.com',
+            'password' => bcrypt('12345678'),
+            'role' => 'gudang',
+        ]);
+        
+        User::create([
+            'name' => 's',
+            'email' => 's@gmail.com',
+            'password' => bcrypt('12345678'),
+            'role' => 'owner',
+        ]);
+
         $roles = ['admin', 'kasir', 'gudang', 'owner'];
         $karyawans = [];
         foreach ($roles as $index => $role) {
@@ -124,9 +153,21 @@ class DatabaseSeeder extends Seeder
         // 7. Produk
         $produks = [];
         $namaProduk = [
-            'Beras 5kg', 'Minyak Goreng 1L', 'Gula Pasir 1kg', 'Kopi Kapal Api', 'Teh Kotak',
-            'Sabun Lifebuoy', 'Pepsodent 190g', 'Rinso 800g', 'Aqua 600ml', 'Indomie Goreng',
-            'Rokok Sampoerna', 'Pulpen Snowman', 'Buku Tulis Sidu', 'Laptop Charger', 'Mouse Wireless'
+            'Beras 5kg',
+            'Minyak Goreng 1L',
+            'Gula Pasir 1kg',
+            'Kopi Kapal Api',
+            'Teh Kotak',
+            'Sabun Lifebuoy',
+            'Pepsodent 190g',
+            'Rinso 800g',
+            'Aqua 600ml',
+            'Indomie Goreng',
+            'Rokok Sampoerna',
+            'Pulpen Snowman',
+            'Buku Tulis Sidu',
+            'Laptop Charger',
+            'Mouse Wireless'
         ];
 
         foreach ($namaProduk as $nama) {

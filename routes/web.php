@@ -21,7 +21,7 @@ use App\Http\Controllers\UserController;
 
 // === GUNAKAN LARAVEL BREEZE AUTHENTICATION ===
 // File ini otomatis dibuat pas php artisan breeze:install
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';
 
 // Redirect root ke dashboard kalau sudah login, kalau belum otomatis ke login (Breeze handle)
 Route::get('/', [DashboardController::class, 'index'])
@@ -37,7 +37,7 @@ Route::get('/dashboard', [DashboardController::class, 'index'])
 Route::middleware(['auth', 'role:admin'])->group(function () {
 
     Route::resource('user', UserController::class);
-    
+
     // Master Data
     Route::resource('produk', ProdukController::class);
     Route::resource('kategori', KategoriController::class);
@@ -74,4 +74,6 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    Route::delete('/profile/hapus-foto', [ProfileController::class, 'hapusFoto'])
+        ->name('profile.hapus-foto');
 });
