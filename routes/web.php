@@ -81,3 +81,17 @@ Route::prefix('pos')->group(function () {
     Route::post('/proses', [KasirController::class, 'prosesTransaksi']);
     Route::get('/cetak-struk/{id}', [KasirController::class, 'cetakStruk']);
 });
+
+// Tambahkan route ini di dalam group admin middleware
+Route::prefix('admin')->middleware(['auth'])->group(function () {
+    Route::resource('returpenjualan', ReturPenjualanController::class);
+    Route::get('returpenjualan/get-detail/{id}', [ReturPenjualanController::class, 'getDetailTransaksi']);
+    
+});
+
+// Tambahkan route ini di dalam group admin middleware
+Route::prefix('admin')->middleware(['auth'])->group(function () {
+    Route::resource('returpembelian', ReturPembelianController::class);
+    Route::get('returpembelian/get-detail/{id}', [ReturPembelianController::class, 'getDetailTransaksi']);
+    
+});
