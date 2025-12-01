@@ -68,7 +68,7 @@ class TransaksiPembelianController extends Controller
             }
         });
 
-        return redirect()->route('transaksi.pembelian.index')->with('success', 'Pembelian berhasil disimpan.');
+        return redirect()->route('pembelian.index')->with('success', 'Pembelian berhasil disimpan.');
     }
 
     public function edit(TransaksiPembelian $transaksiPembelian)
@@ -136,7 +136,7 @@ public function update(Request $request, TransaksiPembelian $transaksiPembelian)
     });
 
     return redirect()
-        ->route('transaksi.pembelian.index')
+        ->route('pembelian.index')
         ->with('success', 'Transaksi pembelian berhasil diperbarui.');
 }
 

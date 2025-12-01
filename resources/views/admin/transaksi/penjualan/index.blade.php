@@ -1,4 +1,4 @@
-@extends('layouts.admin')
+@extends('layouts.app')
 
 @section('content')
 <div class="container-fluid">
@@ -8,7 +8,7 @@
         <div class="alert alert-success">{{ session('success') }}</div>
     @endif
 
-    <a href="{{ route('transaksi.penjualan.create') }}" class="btn btn-primary mb-3">
+    <a href="{{ route('penjualan.create') }}" class="btn btn-primary mb-3">
         + Transaksi Baru
     </a>
 
@@ -47,7 +47,7 @@
                             <td>Rp {{ number_format($t->diskon, 0, ',', '.') }}</td>
                             <td><strong>Rp {{ number_format($t->total_bayar, 0, ',', '.') }}</strong></td>
                             <td>
-                                <a href="{{ route('transaksi.penjualan.show', $t->id) }}" class="btn btn-info btn-sm">
+                                <a href="{{ route('penjualan.show', $t->id) }}" class="btn btn-info btn-sm">
                                     Lihat
                                 </a>
                             </td>

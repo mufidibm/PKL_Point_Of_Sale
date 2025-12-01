@@ -40,7 +40,7 @@
 
                 {{-- MASTER DATA --}}
                 <li
-                    class="nav-item {{ request()->is('produk*', 'kategori*', 'supplier*', 'gudang*', 'karyawan*', 'pelanggan*', 'membership*', 'user*') ? 'menu-open' : '' }}">
+                    class="nav-item {{ request()->is('produk*', 'kategori*', 'supplier*', 'gudang*', 'stokgudang*', 'karyawan*', 'pelanggan*', 'membership*', 'user*') ? 'menu-open' : '' }}">
                     <a href="#"
                        class="nav-link">
                         <i class="nav-icon fas fa-database"></i>
@@ -87,7 +87,7 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="{{ route('stok.index') }}"
+                            <a href="{{ route('stokgudang.index') }}"
                                class="nav-link {{ request()->is('stok*') ? 'active' : '' }}">
                                 <i class="far fa-circle nav-icon"></i>
                                 <p>Stok Gudang</p>

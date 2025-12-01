@@ -79,7 +79,7 @@ class TransaksiPenjualanController extends Controller
             }
         });
 
-        return redirect()->route('transaksi.penjualan.index')->with('success', 'Penjualan berhasil disimpan.');
+        return redirect()->route('penjualan.index')->with('success', 'Penjualan berhasil disimpan.');
     }
 
     public function edit(TransaksiPenjualan $transaksiPenjualan)
@@ -162,7 +162,7 @@ public function update(Request $request, TransaksiPenjualan $transaksiPenjualan)
     });
 
     return redirect()
-        ->route('transaksi.penjualan.index')
+        ->route('penjualan.index')
         ->with('success', 'Transaksi penjualan berhasil diperbarui.');
 }
 

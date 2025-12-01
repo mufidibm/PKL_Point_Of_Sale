@@ -2,10 +2,12 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class TransaksiPembelian extends Model
 {
+    use HasFactory;
     protected $table = 'transaksi_pembelians';
 
     protected $fillable = [
@@ -21,7 +23,17 @@ class TransaksiPembelian extends Model
         'total_biaya' => 'decimal:2',
     ];
 
-    // Relationships
+    // RELASI DIPERBAIKI: GUNAKAN JAMAK
+    public function detailPembelians()
+    {
+        return $this->hasMany(DetailPembelian::class, 'transaksi_id');
+    }
+
+    public function returPembelians()
+    {
+        return $this->hasMany(ReturPembelian::class, 'transaksi_id');
+    }
+
     public function supplier()
     {
         return $this->belongsTo(Supplier::class);
@@ -32,16 +44,6 @@ class TransaksiPembelian extends Model
         return $this->belongsTo(Karyawan::class);
     }
 
-    public function detailPembelian()
-    {
-        return $this->hasMany(DetailPembelian::class, 'transaksi_id');
-    }
-
-    public function returPembelian()
-    {
-        return $this->hasMany(ReturPembelian::class, 'transaksi_id');
-    }
-
     // Auto generate PO number
     protected static function boot()
     {
@@ -49,7 +51,10 @@ class TransaksiPembelian extends Model
         
         static::creating(function ($model) {
             if (empty($model->no_po)) {
-                $model->no_po = 'PO-' . date('Ymd') . '-' . str_pad(static::whereDate('created_at', today())->count() + 1, 4, '0', STR_PAD_LEFT);
+                $model->no_po = 'PO-' . date('Ymd') . '-' . str_pad(
+                    static::whereDate('created_at', today())->count() + 1,
+                    4, '0', STR_PAD_LEFT
+                );
             }
         });
     }
