@@ -1,8 +1,8 @@
 @extends('layouts.app')
+@section('title', 'Daftar Transaksi Penjualan')
 
 @section('content')
 <div class="container-fluid">
-    <h1 class="mb-3">Daftar Transaksi Penjualan</h1>
 
     @if(session('success'))
         <div class="alert alert-success">{{ session('success') }}</div>

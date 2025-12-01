@@ -1,8 +1,8 @@
 @extends('layouts.app')
+@section('title', 'Daftar Kategori')
 
 @section('content')
 <div class="container-fluid">
-    <h1 class="mb-3">Data Kategori</h1>
 
     <a href="{{ route('kategori.create') }}" class="btn btn-primary mb-3">+ Tambah Kategori</a>
 

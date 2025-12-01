@@ -1,8 +1,8 @@
 @extends('layouts.app')
+@section('title', 'Daftar Supplier')
 
 @section('content')
 <div class="container-fluid">
-    <h1 class="mb-3">Daftar Supplier</h1>
     <a href="{{ route('supplier.create') }}" class="btn btn-primary mb-3">
         <i class="fas fa-plus"></i> Tambah Supplier
     </a>

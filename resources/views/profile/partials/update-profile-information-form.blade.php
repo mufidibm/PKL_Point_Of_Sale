@@ -1,4 +1,3 @@
-{{-- resources/views/profile/partials/update-profile-information-form.blade.php --}}
 <style>
     .custom-file-upload {
         display: inline-block;
@@ -64,8 +63,15 @@
         <!-- Foto Profil + Preview -->
         <div class="col-md-4">
             <div class="profile-photo-section text-center">
+                @php
+                    $name = auth()->user()->name;
+                    $foto = auth()->user()->foto_profil;
+                    $defaultAvatar = 'https://ui-avatars.com/api/?name=' . urlencode($name) . '&background=343a40&color=fff&bold=true&rounded=true&size=256';
+                    $currentPhoto = $foto ? (filter_var($foto, FILTER_VALIDATE_URL) ? $foto : Storage::url($foto)) : $defaultAvatar;
+                @endphp
+                
                 <img id="preview-foto"
-                     src="{{ auth()->user()->foto_profil_url }}"
+                     src="{{ $currentPhoto }}"
                      class="profile-user-img img-fluid img-circle elevation-2 mb-3"
                      style="width: 150px; height: 150px; object-fit: cover;"
                      alt="Foto Profil">
@@ -175,6 +181,9 @@
     function hapusFoto() {
         if (!confirm('Yakin ingin menghapus foto profil?')) return;
         
+        const userName = '{{ auth()->user()->name }}';
+        const defaultAvatar = 'https://ui-avatars.com/api/?name=' + encodeURIComponent(userName) + '&background=343a40&color=fff&bold=true&rounded=true&size=256';
+        
         fetch('{{ route('profile.hapus-foto') }}', {
             method: 'DELETE',
             headers: {
@@ -185,7 +194,7 @@
         .then(res => res.json())
         .then(data => {
             if (data.success) {
-                document.getElementById('preview-foto').src = '{{ asset('adminlte/dist/img/user2-160x160.jpg') }}';
+                document.getElementById('preview-foto').src = defaultAvatar;
                 location.reload();
             }
         })

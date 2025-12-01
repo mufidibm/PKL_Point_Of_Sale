@@ -40,7 +40,7 @@
         @include('layouts.partials.navbar')
         @include('layouts.partials.sidebar')
 
-        <div class="content-wrapper">
+        <div class="content-wrapper p-4">
             <div class="content-header">
                 <div class="container-fluid">
                     <div class="row mb-2">

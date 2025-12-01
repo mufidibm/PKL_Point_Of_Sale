@@ -1,8 +1,8 @@
 @extends('layouts.app')
+@section('title', 'Laporan Transaksi')
 
 @section('content')
 <div class="container-fluid">
-    <h1 class="mb-3">Laporan Transaksi</h1>
 
     <!-- Filter -->
     <div class="card mb-3">
