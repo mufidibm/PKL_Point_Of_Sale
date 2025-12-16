@@ -15,11 +15,19 @@ class TransaksiPenjualan extends Model
         'tanggal',
         'karyawan_id',
         'pelanggan_id',
+        'membership_id',  // ← tambahkan
         'subtotal',
+        'uang_dibayar',
         'diskon',
         'total_bayar',
         'metode_bayar',
     ];
+
+    // tambahkan relasi
+    public function membership()
+    {
+        return $this->belongsTo(Membership::class);
+    }
 
     protected $casts = [
         'tanggal' => 'datetime',
@@ -49,11 +57,12 @@ class TransaksiPenjualan extends Model
         return $this->hasMany(ReturPenjualan::class, 'transaksi_id');
     }
 
+
     // Auto generate invoice number
     protected static function boot()
     {
         parent::boot();
-        
+
         static::creating(function ($model) {
             if (empty($model->no_invoice)) {
                 $model->no_invoice = 'INV-' . date('Ymd') . '-' . str_pad(static::whereDate('created_at', today())->count() + 1, 4, '0', STR_PAD_LEFT);

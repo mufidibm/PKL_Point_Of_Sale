@@ -1,4 +1,5 @@
 <?php
+
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -11,8 +12,9 @@ return new class extends Migration {
             $table->foreignId('produk_id')->constrained()->cascadeOnDelete();
             $table->foreignId('gudang_id')->constrained()->cascadeOnDelete();
             $table->integer('jumlah_stok')->default(0);
-            $table->timestamp('updated_at')->useCurrentOnUpdate()->useCurrent();
             $table->unique(['produk_id', 'gudang_id']);
+            $table->timestamp('created_at')->useCurrent();
+            $table->timestamp('updated_at')->useCurrentOnUpdate()->nullable();
         });
     }
 
