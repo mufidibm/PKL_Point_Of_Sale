@@ -181,6 +181,17 @@
                     </a>
                 </li>
 
+                {{-- PENGATURAN TOKO --}}
+                @if(isRole('admin'))
+                    <li class="nav-item">
+                        <a href="{{ route('settings.index') }}"
+                           class="nav-link {{ request()->routeIs('settings.*') ? 'active' : '' }}">
+                            <i class="nav-icon fas fa-cog"></i>
+                            <p>Pengaturan Toko</p>
+                        </a>
+                    </li>
+                @endif
+
                 {{-- LOGOUT --}}
                 <li class="nav-item">
                     <a href="{{ route('logout') }}"

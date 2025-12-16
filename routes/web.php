@@ -17,6 +17,7 @@ use App\Http\Controllers\MembershipController;
 use App\Http\Controllers\LaporanController;
 use App\Http\Controllers\KasirController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\SettingController;
 use App\Http\Controllers\UserController;
 
 // === GUNAKAN LARAVEL BREEZE AUTHENTICATION ===
@@ -53,15 +54,21 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     // Retur
     Route::resource('retur-penjualan', ReturPenjualanController::class);
     Route::resource('retur-pembelian', ReturPembelianController::class);
+    // Laporan (sesuai yang kamu punya)
+    Route::get('/laporan', [LaporanController::class, 'index'])->name('laporan.index');
+    Route::get('/laporan/export/{type}', [LaporanController::class, 'export'])->name('laporan.export');
+
+    Route::get('/settings', [SettingController::class, 'index'])->name('settings.index');
+    Route::post('/settings', [SettingController::class, 'update'])->name('settings.update');
 
     //POS
     Route::prefix('pos')->group(function () {
-    Route::get('/kasir', [KasirController::class, 'index'])->name('pos.index');
-    Route::get('/cari-produk', [KasirController::class, 'cariProduk']);
-    Route::get('/cari-membership', [KasirController::class, 'cariMembership']);
-    Route::post('/proses', [KasirController::class, 'prosesTransaksi']);
-    Route::get('/cetak-struk/{id}', [KasirController::class, 'cetakStruk']);
-});
+        Route::get('/kasir', [KasirController::class, 'index'])->name('pos.index');
+        Route::get('/cari-produk', [KasirController::class, 'cariProduk']);
+        Route::get('/cari-membership', [KasirController::class, 'cariMembership']);
+        Route::post('/proses', [KasirController::class, 'prosesTransaksi']);
+        Route::get('/cetak-struk/{id}', [KasirController::class, 'cetakStruk']);
+    });
 });
 
 //pelanggan
@@ -70,9 +77,6 @@ Route::resource('pelanggan', PelangganController::class);
 //Gudang
 Route::resource('gudang', GudangController::class);
 
-    // Laporan (sesuai yang kamu punya)
-    Route::get('/laporan', [LaporanController::class, 'index'])->name('laporan.index');
-    Route::get('/laporan/export/{type}', [LaporanController::class, 'export'])->name('laporan.export');
 // === POS / KASIR (bisa diakses oleh kasir nanti tinggal tambah role:kasir) ===
 
 Route::middleware('auth')->group(function () {
@@ -87,12 +91,10 @@ Route::middleware('auth')->group(function () {
 Route::prefix('admin')->middleware(['auth'])->group(function () {
     Route::resource('returpenjualan', ReturPenjualanController::class);
     Route::get('returpenjualan/get-detail/{id}', [ReturPenjualanController::class, 'getDetailTransaksi']);
-    
 });
 
 // Tambahkan route ini di dalam group admin middleware
 Route::prefix('admin')->middleware(['auth'])->group(function () {
     Route::resource('returpembelian', ReturPembelianController::class);
     Route::get('returpembelian/get-detail/{id}', [ReturPembelianController::class, 'getDetailTransaksi']);
-    
 });

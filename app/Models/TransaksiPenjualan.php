@@ -17,6 +17,7 @@ class TransaksiPenjualan extends Model
         'pelanggan_id',
         'membership_id',  // ← tambahkan
         'subtotal',
+        'uang_dibayar',
         'diskon',
         'total_bayar',
         'metode_bayar',

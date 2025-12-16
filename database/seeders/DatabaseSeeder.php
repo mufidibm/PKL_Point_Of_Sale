@@ -71,21 +71,21 @@ class DatabaseSeeder extends Seeder
             'password' => bcrypt('12345678'),
             'role' => 'admin',
         ]);
-        
+
         User::create([
             'name' => 'w',
             'email' => 'w@gmail.com',
             'password' => bcrypt('12345678'),
             'role' => 'kasir',
         ]);
-        
+
         User::create([
             'name' => 'a',
             'email' => 'a@gmail.com',
             'password' => bcrypt('12345678'),
             'role' => 'gudang',
         ]);
-        
+
         User::create([
             'name' => 's',
             'email' => 's@gmail.com',
@@ -243,11 +243,14 @@ class DatabaseSeeder extends Seeder
             $subtotal = 0;
             $diskon = 0;
 
+            $pelanggan = $faker->randomElement($pelanggans);
+
             $transaksi = \App\Models\TransaksiPenjualan::create([
                 'no_invoice' => 'INV' . $faker->unique()->numberBetween(10000, 99999),
                 'tanggal' => $faker->dateTimeBetween('-2 months', 'now')->format('Y-m-d'),
                 'karyawan_id' => $faker->randomElement(array_filter($karyawans, fn($k) => in_array($k->jabatan, ['Kasir', 'admin'])))->id,
-                'pelanggan_id' => $faker->randomElement($pelanggans)->id,
+                'pelanggan_id' => $pelanggan->id, // ← UBAH: pakai $pelanggan (bukan $pelanggans)
+                'membership_id' => $pelanggan->membership_id, // ← UBAH: pakai $pelanggan
                 'subtotal' => 0,
                 'diskon' => 0,
                 'total_bayar' => 0,
@@ -280,7 +283,6 @@ class DatabaseSeeder extends Seeder
             }
 
             // Hitung diskon dari membership
-            $pelanggan = $transaksi->pelanggan;
             if ($pelanggan->membership) {
                 $diskon = $subtotal * ($pelanggan->membership->diskon_persen / 100);
             }
