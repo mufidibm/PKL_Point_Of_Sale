@@ -23,12 +23,6 @@ class TransaksiPenjualan extends Model
         'metode_bayar',
     ];
 
-    // tambahkan relasi
-    public function membership()
-    {
-        return $this->belongsTo(Membership::class);
-    }
-
     protected $casts = [
         'tanggal' => 'datetime',
         'subtotal' => 'decimal:2',

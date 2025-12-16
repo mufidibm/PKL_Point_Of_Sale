@@ -73,7 +73,6 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
         Route::post('/proses', [KasirController::class, 'prosesTransaksi']);
         Route::get('/cetak-struk/{id}', [KasirController::class, 'cetakStruk']);
     });
-});
 
 //pelanggan
 Route::resource('pelanggan', PelangganController::class);
