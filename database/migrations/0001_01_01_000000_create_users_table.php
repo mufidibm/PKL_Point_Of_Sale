@@ -18,6 +18,7 @@ return new class extends Migration
             $table->enum('role', ['admin', 'kasir', 'gudang', 'owner'])->default('admin');
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
+            $table->string('foto_profil')->nullable();
             $table->rememberToken();
             $table->timestamp('created_at')->useCurrent();
             $table->timestamp('updated_at')->useCurrentOnUpdate()->nullable();

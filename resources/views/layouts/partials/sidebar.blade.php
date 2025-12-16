@@ -10,18 +10,6 @@
 
     <!-- Sidebar -->
     <div class="sidebar">
-        <!-- User Info -->
-        <div class="user-panel mt-3 pb-3 mb-3 d-flex">
-            <div class="image">
-                <img src="{{ asset('adminlte/dist/img/user2-160x160.jpg') }}"
-                     class="img-circle elevation-2"
-                     alt="User">
-            </div>
-            <div class="info">
-                <a href="#"
-                   class="d-block">{{ Auth::user()->name ?? 'User' }}</a>
-            </div>
-        </div>
 
         <!-- Menu -->
         <nav class="mt-2">
@@ -41,7 +29,7 @@
                 {{-- MASTER DATA --}}
                 @if(Auth::user()->role === 'admin')
                 <li
-                    class="nav-item {{ request()->is('produk*', 'kategori*', 'supplier*', 'gudang*', 'karyawan*', 'pelanggan*', 'membership*', 'user*') ? 'menu-open' : '' }}">
+                    class="nav-item {{ request()->is('produk*', 'kategori*', 'supplier*', 'gudang*', 'stokgudang*', 'karyawan*', 'pelanggan*', 'membership*', 'user*') ? 'menu-open' : '' }}">
                     <a href="#"
                        class="nav-link">
                         <i class="nav-icon fas fa-database"></i>
@@ -88,7 +76,7 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="{{ route('stok.index') }}"
+                            <a href="{{ route('stokgudang.index') }}"
                                class="nav-link {{ request()->is('stok*') ? 'active' : '' }}">
                                 <i class="far fa-circle nav-icon"></i>
                                 <p>Stok Gudang</p>
@@ -198,6 +186,17 @@
                         <p>Laporan</p>
                     </a>
                 </li>
+                @endif
+
+                {{-- PENGATURAN TOKO --}}
+                @if(isRole('admin'))
+                    <li class="nav-item">
+                        <a href="{{ route('settings.index') }}"
+                           class="nav-link {{ request()->routeIs('settings.*') ? 'active' : '' }}">
+                            <i class="nav-icon fas fa-cog"></i>
+                            <p>Pengaturan Toko</p>
+                        </a>
+                    </li>
                 @endif
 
                 {{-- LOGOUT --}}

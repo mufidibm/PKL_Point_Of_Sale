@@ -26,9 +26,13 @@ class LaporanController extends Controller
         $chartPembelian = $this->chartData($pembelian->groupBy('tanggal'), 'total_bayar');
 
         return view('admin.laporan.index', compact(
-            'type', 'penjualan', 'pembelian',
-            'chartPenjualan', 'chartPembelian',
-            'mulai', 'selesai'
+            'type',
+            'penjualan',
+            'pembelian',
+            'chartPenjualan',
+            'chartPembelian',
+            'mulai',
+            'selesai'
         ));
     }
 
@@ -37,7 +41,7 @@ class LaporanController extends Controller
         $query = TransaksiPenjualan::with(['pelanggan.membership', 'karyawan']);
         if ($mulai) $query->whereDate('tanggal', '>=', $mulai);
         if ($selesai) $query->whereDate('tanggal', '<=', $selesai);
-        return $query->get();
+        return $query->paginate(10);
     }
 
     private function getPembelian($mulai = null, $selesai = null)
@@ -45,7 +49,23 @@ class LaporanController extends Controller
         $query = TransaksiPembelian::with(['supplier', 'karyawan']);
         if ($mulai) $query->whereDate('tanggal', '>=', $mulai);
         if ($selesai) $query->whereDate('tanggal', '<=', $selesai);
-        return $query->get();
+        return $query->paginate(10);
+    }
+
+    private function getAllPenjualan($mulai = null, $selesai = null)
+    {
+        $query = TransaksiPenjualan::with(['pelanggan.membership', 'karyawan']);
+        if ($mulai) $query->whereDate('tanggal', '>=', $mulai);
+        if ($selesai) $query->whereDate('tanggal', '<=', $selesai);
+        return $query->get(); // Ambil semua
+    }
+
+    private function getAllPembelian($mulai = null, $selesai = null)
+    {
+        $query = TransaksiPembelian::with(['supplier', 'karyawan']);
+        if ($mulai) $query->whereDate('tanggal', '>=', $mulai);
+        if ($selesai) $query->whereDate('tanggal', '<=', $selesai);
+        return $query->get(); // Ambil semua
     }
 
     private function chartData($data, $field)
@@ -59,20 +79,21 @@ class LaporanController extends Controller
     {
         $mulai = $request->tanggal_mulai;
         $selesai = $request->tanggal_selesai;
-        $format = $request->input('format'); // pdf atau excel
+        $format = $request->input('format');
 
+        // Gunakan data full (bukan paginated)
         $data = $type === 'penjualan'
-            ? $this->getPenjualan($mulai, $selesai)
-            : $this->getPembelian($mulai, $selesai);
+            ? $this->getAllPenjualan($mulai, $selesai)
+            : $this->getAllPembelian($mulai, $selesai);
 
-        $title = ucfirst($type) . " - " . ($mulai ? $mulai : 'Semua') . " s/d " . ($selesai ? $selesai : 'Sekarang');
+        $title = ucfirst($type) . " - " . ($mulai ?: 'Semua') . " s/d " . ($selesai ?: 'Sekarang');
 
         if ($format === 'pdf') {
             $pdf = Pdf::loadView('admin.laporan.pdf', compact('data', 'type', 'title'));
             return $pdf->download("laporan_{$type}.pdf");
         }
 
-        // Excel
+        // Excel (sama seperti sebelumnya, tapi sekarang $data full)
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
 
@@ -93,8 +114,11 @@ class LaporanController extends Controller
             $sheet->fromArray(['No', 'PO', 'Tanggal', 'Supplier', 'Total'], null, 'A1');
             foreach ($data as $i => $t) {
                 $sheet->fromArray([
-                    $i + 1, $t->no_po, $t->tanggal->format('d/m/Y'),
-                    $t->supplier?->nama ?? '-', $t->total_bayar
+                    $i + 1,
+                    $t->no_po,
+                    $t->tanggal->format('d/m/Y'),
+                    $t->supplier?->nama ?? '-',
+                    $t->total_bayar
                 ], null, "A" . ($i + 2));
             }
         }

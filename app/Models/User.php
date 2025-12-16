@@ -2,11 +2,13 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
 {
+    use HasFactory;
     use Notifiable;
 
     protected $fillable = [
@@ -14,6 +16,7 @@ class User extends Authenticatable
         'email',
         'password',
         'role',
+        'foto_profil',
     ];
 
     protected $hidden = [
@@ -49,5 +52,12 @@ class User extends Authenticatable
     public function isGudang()
     {
         return $this->role === 'gudang';
+    }
+
+    public function getFotoProfilUrlAttribute()
+    {
+        return $this->foto_profil
+            ? asset('storage/foto-profil/' . $this->foto_profil)
+            : asset('adminlte/dist/img/user2-160x160.jpg');
     }
 }

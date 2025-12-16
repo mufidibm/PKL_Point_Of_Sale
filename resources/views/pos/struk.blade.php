@@ -1,8 +1,13 @@
+@php
+    $settings = \App\Models\Setting::getSettings();
+@endphp
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
     <title>Struk Pembayaran - {{ $transaksi->no_invoice }}</title>
     <style>
         * {
@@ -24,7 +29,7 @@
             margin: 0 auto;
             background: white;
             padding: 10mm;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
 
         .header {
@@ -198,14 +203,15 @@
         }
     </style>
 </head>
+
 <body onload="window.print()">
     <div class="struk-container">
         <!-- Header Toko -->
         <div class="header">
-            <h2>NAMA TOKO ANDA</h2>
-            <p>Jl. Alamat Toko No. 123</p>
-            <p>Telp: (021) 1234-5678</p>
-            <p>Email: toko@email.com</p>
+            <h2>{{ $settings->nama_toko }}</h2>
+            <p>{{ $settings->alamat }}</p>
+            <p>Telp: {{ $settings->telepon }}</p>
+            <p>Email: {{ $settings->email }}</p>
         </div>
 
         <!-- Info Transaksi -->
@@ -217,31 +223,31 @@
                 </tr>
                 <tr>
                     <td>Tanggal</td>
-                    <td>: {{ \Carbon\Carbon::parse($transaksi->tanggal)->format('d/m/Y H:i') }}</td>
+                    <td>: {{ $transaksi->created_at->timezone('Asia/Jakarta')->format('d/m/Y H:i') }}</td>
                 </tr>
                 <tr>
                     <td>Kasir</td>
                     <td>: {{ auth()->user()->name ?? 'Admin' }}</td>
                 </tr>
                 @if($transaksi->membership)
-                <tr>
-                    <td>Member</td>
-                    <td>: {{ $transaksi->membership->nama_membership }}</td>
-                </tr>
+                    <tr>
+                        <td>Member</td>
+                        <td>: {{ $transaksi->membership->nama_membership }}</td>
+                    </tr>
                 @endif
             </table>
         </div>
 
         <!-- Daftar Item -->
         <div class="items">
-            @foreach($transaksi->detailPenjualan as $detail)
-            <div class="item">
-                <div class="item-name">{{ $detail->produk->nama_produk }}</div>
-                <div class="item-detail">
-                    <span>{{ $detail->jumlah }} x Rp {{ number_format($detail->harga_jual, 0, ',', '.') }}</span>
-                    <span>Rp {{ number_format($detail->subtotal, 0, ',', '.') }}</span>
+            @foreach($transaksi->detailPenjualans as $detail)
+                <div class="item">
+                    <div class="item-name">{{ $detail->produk->nama_produk }}</div>
+                    <div class="item-detail">
+                        <span>{{ $detail->jumlah }} x Rp {{ number_format($detail->harga_satuan, 0, ',', '.') }}</span>
+                        <span>Rp {{ number_format($detail->subtotal, 0, ',', '.') }}</span>
+                    </div>
                 </div>
-            </div>
             @endforeach
         </div>
 
@@ -253,10 +259,10 @@
                     <td>Rp {{ number_format($transaksi->subtotal, 0, ',', '.') }}</td>
                 </tr>
                 @if($transaksi->diskon > 0)
-                <tr>
-                    <td>Diskon Member</td>
-                    <td>(Rp {{ number_format($transaksi->diskon, 0, ',', '.') }})</td>
-                </tr>
+                    <tr>
+                        <td>Diskon Member</td>
+                        <td>(Rp {{ number_format($transaksi->diskon, 0, ',', '.') }})</td>
+                    </tr>
                 @endif
                 <tr class="total-row">
                     <td>TOTAL</td>
@@ -274,38 +280,42 @@
                 </tr>
                 <tr>
                     <td>Uang Dibayar</td>
-                    <td>Rp {{ number_format($transaksi->total_bayar, 0, ',', '.') }}</td>
+                    <td>Rp {{ number_format($transaksi->uang_dibayar, 0, ',', '.') }}</td>
                 </tr>
                 <tr class="kembalian-row">
                     <td>KEMBALIAN</td>
-                    <td>Rp {{ number_format(0, 0, ',', '.') }}</td>
+                    <td>Rp {{ number_format($transaksi->uang_dibayar - $transaksi->total_bayar, 0, ',', '.') }}</td>
                 </tr>
             </table>
         </div>
 
         <!-- Footer -->
         <div class="footer">
-            <p>{{ \Carbon\Carbon::now()->format('d/m/Y H:i:s') }}</p>
-            <p>Barang yang sudah dibeli tidak dapat dikembalikan</p>
-            <p class="thank-you">*** TERIMA KASIH ***</p>
-            <p>Selamat Berbelanja Kembali</p>
+            <p>{{ \Carbon\Carbon::now()->timezone('Asia/Jakarta')->format('d/m/Y H:i:s') }}</p>
+            <p>{{ $settings->footer_note1 }}</p>
+            <p class="thank-you">{{ $settings->thank_you_message }}</p>
+            <p>{{ $settings->footer_note2 }}</p>
         </div>
     </div>
 
     <!-- Tombol Action (tidak tercetak) -->
     <div class="btn-container no-print">
-        <button class="btn btn-print" onclick="window.print()">
-            Cetak Ulang
+        <button class="btn btn-print"
+                onclick="window.print()">
+            🖨️ Cetak Ulang
         </button>
-        <button class="btn btn-close" onclick="window.close()">
-            Tutup
+        <button class="btn btn-close"
+                onclick="window.close()">
+            ✖️ Tutup
         </button>
     </div>
 
-    <script>    
-        window.onafterprint = function() {
+    <script>
+        // Auto close setelah print (opsional)
+        window.onafterprint = function () {
             // window.close(); // Uncomment jika ingin auto close
         }
     </script>
 </body>
+
 </html>

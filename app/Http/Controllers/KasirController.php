@@ -17,11 +17,11 @@ class KasirController extends Controller
         return view('pos.index');
     }
 
-    
+
     public function cariProduk(Request $request)
     {
         $keyword = $request->keyword;
-        
+
         $produk = Produk::where('barcode', $keyword)
             ->orWhere('nama_produk', 'LIKE', "%{$keyword}%")
             ->with(['kategori', 'stokGudang'])
@@ -34,9 +34,9 @@ class KasirController extends Controller
             ], 404);
         }
 
-        $data = $produk->map(function($p) {
+        $data = $produk->map(function ($p) {
             $stokTersedia = $p->stokGudang ? $p->stokGudang->sum('jumlah_stok') : 0;
-            
+
             return [
                 'id' => $p->id,
                 'nama_produk' => $p->nama_produk,
@@ -57,7 +57,7 @@ class KasirController extends Controller
     public function cariMembership(Request $request)
     {
         $keyword = $request->keyword;
-        
+
         $membership = Membership::where('nama_membership', 'LIKE', "%{$keyword}%")
             ->limit(10)
             ->get();
@@ -69,7 +69,7 @@ class KasirController extends Controller
             ], 404);
         }
 
-        $data = $membership->map(function($m) {
+        $data = $membership->map(function ($m) {
             return [
                 'id' => $m->id,
                 'nama' => $m->nama_membership,
@@ -101,16 +101,16 @@ class KasirController extends Controller
 
         DB::beginTransaction();
         try {
-            // Data transaksi
             $dataTransaksi = [
                 'no_invoice' => $this->generateNoInvoice(),
                 'tanggal' => now(),
                 'subtotal' => $request->subtotal,
                 'diskon' => $request->diskon ?? 0,
                 'total_bayar' => $request->total_bayar,
+                'uang_dibayar' => $request->uang_dibayar, // ← TAMBAHKAN INI
                 'metode_bayar' => $request->metode_bayar ?? 'tunai',
                 'status' => 'selesai',
-                'karyawan_id' => auth()->id() // ← User yang login sebagai kasir
+                'karyawan_id' => auth()->id()
             ];
 
             // Tambahkan membership_id dan pelanggan_id hanya jika ada
@@ -118,7 +118,7 @@ class KasirController extends Controller
                 $dataTransaksi['membership_id'] = $request->membership_id;
                 $dataTransaksi['pelanggan_id'] = $request->membership_id;
             }
-            
+
             // Buat transaksi penjualan
             $transaksi = TransaksiPenjualan::create($dataTransaksi);
 
@@ -147,7 +147,6 @@ class KasirController extends Controller
                     'transaksi_id' => $transaksi->id
                 ]
             ]);
-
         } catch (\Illuminate\Validation\ValidationException $e) {
             DB::rollback();
             return response()->json([
@@ -155,7 +154,6 @@ class KasirController extends Controller
                 'message' => 'Validasi gagal',
                 'errors' => $e->errors()
             ], 422);
-            
         } catch (\Exception $e) {
             DB::rollback();
             \Log::error('Transaction Error: ' . $e->getMessage());
@@ -208,7 +206,7 @@ class KasirController extends Controller
 
     public function cetakStruk($id)
     {
-        $transaksi = TransaksiPenjualan::with(['detailPenjualan.produk', 'membership'])
+        $transaksi = TransaksiPenjualan::with(['detailPenjualans.produk', 'membership'])
             ->findOrFail($id);
 
         return view('pos.struk', compact('transaksi'));

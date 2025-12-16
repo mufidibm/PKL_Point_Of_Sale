@@ -1,9 +1,9 @@
 
-@extends('layouts.admin')
+@extends('layouts.app')
+@section('title', 'Daftar Produk')
 
 @section('content')
 <div class="container-fluid">
-    <h1 class="mb-3">Daftar Produk</h1>
     <a href="{{ route('produk.create') }}" class="btn btn-primary mb-3">
         <i class="fas fa-plus"></i> Tambah Produk
     </a>
