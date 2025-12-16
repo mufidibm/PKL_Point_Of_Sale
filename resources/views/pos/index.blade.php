@@ -602,25 +602,20 @@ function prosesTransaksi() {
         }
         return response.json();
     })
-    .then(data => {
-        // Enable tombol kembali
-        btnProses.disabled = false;
-        btnProses.innerHTML = '<i class="fas fa-check-circle me-2"></i> PROSES BAYAR';
-        
-        if (data.success) {
-            const kembalian = data.data.kembalian;
-            alert(`✅ TRANSAKSI BERHASIL!\n\nNo Invoice: ${data.data.no_invoice}\nTotal: Rp ${formatRupiah(total)}\nBayar: Rp ${formatRupiah(bayar)}\nKembalian: Rp ${formatRupiah(kembalian)}`);
-            
-            // Cetak struk (optional)
-            if (confirm('Cetak struk?')) {
-                window.open(`/pos/cetak-struk/${data.data.transaksi_id}`, '_blank');
-            }
-            
-            resetKeranjang();
-        } else {
-            alert('❌ Transaksi gagal: ' + data.message);
-        }
-    })
+  .then(data => {
+    btnProses.disabled = false;
+    btnProses.innerHTML = '<i class="fas fa-check-circle me-2"></i> PROSES BAYAR';
+
+    if (data.success) {
+        // Langsung buka struk
+        window.open(`/pos/cetak-struk/${data.data.transaksi_id}`, '_blank');
+
+        // Reset kasir
+        resetKeranjang();
+    } else {
+        alert('❌ Transaksi gagal: ' + data.message);
+    }
+})
     .catch(error => {
         // Enable tombol kembali
         btnProses.disabled = false;

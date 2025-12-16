@@ -295,15 +295,14 @@
     <!-- Tombol Action (tidak tercetak) -->
     <div class="btn-container no-print">
         <button class="btn btn-print" onclick="window.print()">
-            🖨️ Cetak Ulang
+            Cetak Ulang
         </button>
         <button class="btn btn-close" onclick="window.close()">
-            ✖️ Tutup
+            Tutup
         </button>
     </div>
 
-    <script>
-        // Auto close setelah print (opsional)
+    <script>    
         window.onafterprint = function() {
             // window.close(); // Uncomment jika ingin auto close
         }

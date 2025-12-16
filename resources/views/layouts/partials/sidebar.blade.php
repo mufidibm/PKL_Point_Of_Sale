@@ -39,6 +39,7 @@
                 </li>
 
                 {{-- MASTER DATA --}}
+                @if(Auth::user()->role === 'admin')
                 <li
                     class="nav-item {{ request()->is('produk*', 'kategori*', 'supplier*', 'gudang*', 'karyawan*', 'pelanggan*', 'membership*', 'user*') ? 'menu-open' : '' }}">
                     <a href="#"
@@ -116,6 +117,7 @@
                         </li>
                     </ul>
                 </li>
+                @endif
 
                 {{-- TRANSAKSI --}}
                 <li class="nav-item {{ request()->is('penjualan*', 'pembelian*') ? 'menu-open' : '' }}">
@@ -146,6 +148,7 @@
                 </li>
 
                 {{-- RETUR --}}
+                @if(Auth::user()->role === 'admin')
                 <li class="nav-item {{ request()->is('retur-penjualan*', 'retur-pembelian*') ? 'menu-open' : '' }}">
                     <a href="#"
                        class="nav-link">
@@ -172,6 +175,7 @@
                         </li>
                     </ul>
                 </li>
+                  @endif
 
                 {{-- KASIR (POS) --}}
                 <li class="nav-item">
@@ -184,7 +188,9 @@
                         </p>
                     </a>
                 </li>
+
                 {{-- LAPORAN --}}
+                @if(Auth::user()->role === 'admin')
                 <li class="nav-item">
                     <a href="{{ route('laporan.index') }}"
                        class="nav-link {{ request()->is('laporan*') ? 'active' : '' }}">
@@ -192,6 +198,7 @@
                         <p>Laporan</p>
                     </a>
                 </li>
+                @endif
 
                 {{-- LOGOUT --}}
                 <li class="nav-item">

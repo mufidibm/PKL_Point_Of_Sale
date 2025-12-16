@@ -38,16 +38,10 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::resource('membership', MembershipController::class);
     Route::resource('stok', StokController::class);
     Route::resource('laporan', LaporanController::class);
+    ;
+});
 
-    // Transaksi
-    Route::resource('penjualan', TransaksiPenjualanController::class);
-    Route::resource('pembelian', TransaksiPembelianController::class);
-
-    // Retur
-    Route::resource('retur-penjualan', ReturPenjualanController::class);
-    Route::resource('retur-pembelian', ReturPembelianController::class);
-
-    //POS
+//POS
     Route::prefix('pos')->group(function () {
     Route::get('/kasir', [KasirController::class, 'index'])->name('pos.index');
     Route::get('/cari-produk', [KasirController::class, 'cariProduk']);
@@ -55,7 +49,14 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::post('/proses', [KasirController::class, 'prosesTransaksi']);
     Route::get('/cetak-struk/{id}', [KasirController::class, 'cetakStruk']);
 });
-});
+    // Transaksi
+ Route::resource('penjualan', TransaksiPenjualanController::class);
+ Route::resource('pembelian', TransaksiPembelianController::class);
+
+    // Retur
+Route::resource('retur-penjualan', ReturPenjualanController::class);
+Route::resource('retur-pembelian', ReturPembelianController::class);
+
 
 //pelanggan
 Route::resource('pelanggan', PelangganController::class);
