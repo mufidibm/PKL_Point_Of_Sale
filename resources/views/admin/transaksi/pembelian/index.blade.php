@@ -1,14 +1,14 @@
-@extends('layouts.admin')
+@extends('layouts.app')
+@section('title', 'Daftar Transaksi Pembelian')
 
 @section('content')
 <div class="container-fluid">
-    <h1 class="mb-3">Daftar Transaksi Pembelian</h1>
 
     @if(session('success'))
         <div class="alert alert-success">{{ session('success') }}</div>
     @endif
 
-    <a href="{{ route('transaksi.pembelian.create') }}" class="btn btn-primary mb-3">
+    <a href="{{ route('pembelian.create') }}" class="btn btn-primary mb-3">
         + Pembelian Baru
     </a>
 
@@ -36,7 +36,7 @@
                             <td>{{ $t->karyawan?->nama ?? '-' }}</td>
                             <td><strong>Rp {{ number_format($t->total_biaya, 0, ',', '.') }}</strong></td>
                             <td>
-                                <a href="{{ route('transaksi.pembelian.show', $t->id) }}" class="btn btn-info btn-sm">
+                                <a href="{{ route('pembelian.show', $t->id) }}" class="btn btn-info btn-sm">
                                     Lihat
                                 </a>
                             </td>

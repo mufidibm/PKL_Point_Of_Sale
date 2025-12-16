@@ -2,10 +2,12 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class TransaksiPenjualan extends Model
 {
+    use HasFactory;
     protected $table = 'transaksi_penjualans';
 
     protected $fillable = [
@@ -37,12 +39,12 @@ class TransaksiPenjualan extends Model
         return $this->belongsTo(Pelanggan::class);
     }
 
-    public function detailPenjualan()
+    public function detailPenjualans()
     {
         return $this->hasMany(DetailPenjualan::class, 'transaksi_id');
     }
 
-    public function returPenjualan()
+    public function returPenjualans()
     {
         return $this->hasMany(ReturPenjualan::class, 'transaksi_id');
     }

@@ -1,8 +1,8 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\StokController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\StokController;
 use App\Http\Controllers\ProdukController;
 use App\Http\Controllers\KategoriController;
 use App\Http\Controllers\SupplierController;
@@ -16,28 +16,35 @@ use App\Http\Controllers\ReturPembelianController;
 use App\Http\Controllers\MembershipController;
 use App\Http\Controllers\LaporanController;
 use App\Http\Controllers\KasirController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserController;
 
-Auth::routes(); // route bawaan laravel/ui (login, register, dll)
+// === GUNAKAN LARAVEL BREEZE AUTHENTICATION ===
+// File ini otomatis dibuat pas php artisan breeze:install
+require __DIR__ . '/auth.php';
 
-// ✅ Dashboard (default setelah login)
-Route::get('/', [DashboardController::class, 'index'])->name('dashboard')->middleware('auth');
+// Redirect root ke dashboard kalau sudah login, kalau belum otomatis ke login (Breeze handle)
+Route::get('/', [DashboardController::class, 'index'])
+    ->name('dashboard')
+    ->middleware('auth');
 
-// ✅ Group route admin (harus login)
+// Dashboard (sama dengan root, tapi biar ada nama route)
+Route::get('/dashboard', [DashboardController::class, 'index'])
+    ->name('dashboard')
+    ->middleware('auth');
+
+// === SEMUA ROUTE ADMIN (hanya role admin) ===
 Route::middleware(['auth', 'role:admin'])->group(function () {
 
-    // Tambahkan ini di dalam group middleware auth
     Route::resource('user', UserController::class);
+
     // Master Data
     Route::resource('produk', ProdukController::class);
     Route::resource('kategori', KategoriController::class);
     Route::resource('supplier', SupplierController::class);
-    Route::resource('pelanggan', PelangganController::class);
-    Route::resource('gudang', GudangController::class);
+    Route::resource('stokgudang', StokController::class);
     Route::resource('karyawan', KaryawanController::class);
     Route::resource('membership', MembershipController::class);
-    Route::resource('stok', StokController::class);
-    Route::resource('laporan', LaporanController::class);
 
     // Transaksi
     Route::resource('penjualan', TransaksiPenjualanController::class);
@@ -63,23 +70,19 @@ Route::resource('pelanggan', PelangganController::class);
 //Gudang
 Route::resource('gudang', GudangController::class);
 
-//Stok gudang
-Route::resource('stokgudang', StokController::class);
+    // Laporan (sesuai yang kamu punya)
+    Route::get('/laporan', [LaporanController::class, 'index'])->name('laporan.index');
+    Route::get('/laporan/export/{type}', [LaporanController::class, 'export'])->name('laporan.export');
+});
 
-//Karyawan
-Route::resource('karyawan', KaryawanController::class);
+// === POS / KASIR (bisa diakses oleh kasir nanti tinggal tambah role:kasir) ===
 
-//Membership
-Route::resource('membership', MembershipController::class);
-
-//Laporan
-Route::get('/laporan', [LaporanController::class, 'index'])->name('laporan.index');
-Route::get('/laporan/export/{type}', [LaporanController::class, 'export'])->name('laporan.export');
-
-//transaksi
-Route::prefix('transaksi')->name('transaksi.')->group(function () {
-    Route::resource('penjualan', TransaksiPenjualanController::class);
-    Route::resource('pembelian', TransaksiPembelianController::class);
+Route::middleware('auth')->group(function () {
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    Route::delete('/profile/hapus-foto', [ProfileController::class, 'hapusFoto'])
+        ->name('profile.hapus-foto');
 });
 
 // Tambahkan route ini di dalam group admin middleware

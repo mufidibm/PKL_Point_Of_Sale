@@ -1,10 +1,10 @@
-@extends('layouts.admin')
+@extends('layouts.app')
 
 @section('content')
 <div class="container-fluid">
     <h1 class="mb-3">Edit Transaksi Penjualan #{{ $transaksi->no_invoice }}</h1>
 
-    <form action="{{ route('transaksi.penjualan.update', $transaksi->id) }}" method="POST" id="form-penjualan">
+    <form action="{{ route('penjualan.update', $transaksi->id) }}" method="POST" id="form-penjualan">
         @csrf @method('PUT')
         <div class="card">
             <div class="card-body">
@@ -130,7 +130,7 @@
                 <hr>
 
                 <div class="d-flex justify-content-between">
-                    <a href="{{ route('transaksi.penjualan.index') }}" class="btn btn-secondary">Batal</a>
+                    <a href="{{ route('penjualan.index') }}" class="btn btn-secondary">Batal</a>
                     <button type="submit" class="btn btn-warning btn-lg">Update Transaksi</button>
                 </div>
             </div>

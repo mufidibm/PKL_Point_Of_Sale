@@ -1,10 +1,10 @@
-@extends('layouts.admin')
+@extends('layouts.app')
 
 @section('content')
 <div class="container-fluid">
     <h1 class="mb-3">Edit Transaksi Pembelian #{{ $transaksi->no_po }}</h1>
 
-    <form action="{{ route('transaksi.pembelian.update', $transaksi->id) }}" method="POST">
+    <form action="{{ route('pembelian.update', $transaksi->id) }}" method="POST">
         @csrf @method('PUT')
         <div class="card">
             <div class="card-body">
@@ -99,7 +99,7 @@
                 <hr>
 
                 <div class="d-flex justify-content-between">
-                    <a href="{{ route('transaksi.pembelian.index') }}" class="btn btn-secondary">Batal</a>
+                    <a href="{{ route('pembelian.index') }}" class="btn btn-secondary">Batal</a>
                     <button type="submit" class="btn btn-warning btn-lg">Update Pembelian</button>
                 </div>
             </div>
