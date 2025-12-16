@@ -19,19 +19,24 @@ class TransaksiPenjualanController extends Controller
         return view('admin.transaksi.penjualan.index', compact('transaksis'));
     }
 
-    public function create()
-    {
-        $pelanggans = Pelanggan::with('membership')->get();
-        $karyawans = Karyawan::all();
-        $produks = Produk::with('stokGudang')->get();
-        return view('admin.transaksi.penjualan.create', compact('pelanggans', 'karyawans', 'produks'));
-    }
+   public function create()
+{
+    $pelanggans = Pelanggan::with('membership')->get();
+    $karyawans = Karyawan::all();
+    $produks = Produk::with('stokGudang')->get();
+    $pelangganUmum = Pelanggan::where('nama', 'Umum')->firstOrFail(); // tambah ini
+
+    return view('admin.transaksi.penjualan.create', compact(
+        'pelanggans', 'karyawans', 'produks', 'pelangganUmum'
+    ));
+}
+
 
     public function store(Request $request)
     {
         $request->validate([
             'pelanggan_id' => 'nullable|exists:pelanggans,id',
-            'karyawan_id' => 'required|exists:karyawan,id',
+            'karyawan_id' => 'required|exists:karyawans,id',
             'tanggal' => 'required|date',
             'metode_bayar' => 'required|in:tunai,kartu,transfer',
             'items.*.produk_id' => 'required|exists:produks,id',
@@ -82,22 +87,23 @@ class TransaksiPenjualanController extends Controller
         return redirect()->route('transaksi.penjualan.index')->with('success', 'Penjualan berhasil disimpan.');
     }
 
-    public function edit(TransaksiPenjualan $transaksiPenjualan)
+public function edit(TransaksiPenjualan $transaksiPenjualan)
 {
     $transaksiPenjualan->load('detailPenjualan.produk');
     $pelanggans = Pelanggan::with('membership')->get();
     $karyawans = Karyawan::all();
     $produks = Produk::with('stokGudang')->get();
+    $pelangganUmum = Pelanggan::where('nama', 'Umum')->firstOrFail(); // tambah ini
+
     return view('admin.transaksi.penjualan.edit', compact(
-        'transaksiPenjualan', 'pelanggans', 'karyawans', 'produks'
+        'transaksiPenjualan', 'pelanggans', 'karyawans', 'produks', 'pelangganUmum'
     ));
 }
-
 public function update(Request $request, TransaksiPenjualan $transaksiPenjualan)
 {
     $request->validate([
         'pelanggan_id' => 'nullable|exists:pelanggans,id',
-        'karyawan_id' => 'required|exists:karyawan,id',
+        'karyawan_id' => 'required|exists:karyawans,id',
         'tanggal' => 'required|date',
         'metode_bayar' => 'required|in:tunai,kartu,transfer',
         'items.*.produk_id' => 'required|exists:produks,id',
@@ -166,9 +172,9 @@ public function update(Request $request, TransaksiPenjualan $transaksiPenjualan)
         ->with('success', 'Transaksi penjualan berhasil diperbarui.');
 }
 
-    public function show(TransaksiPenjualan $transaksiPenjualan)
-    {
-        $transaksiPenjualan->load('detailPenjualan.produk', 'pelanggan.membership', 'karyawan');
-        return view('admin.transaksi.penjualan.show', compact('transaksiPenjualan'));
-    }
+    public function show(TransaksiPenjualan $penjualan)
+{
+    $penjualan->load('detailPenjualan.produk', 'pelanggan.membership', 'karyawan');
+    return view('admin.transaksi.penjualan.show', compact('penjualan'));
+}
 }

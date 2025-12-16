@@ -24,6 +24,8 @@
                             </button>
                         </div>
                         <small class="text-muted"><i class="fas fa-info-circle"></i> Tekan Enter setelah scan barcode</small>
+
+                        <div id="hasilPencarian" class="list-group position-absolute" style="z-index: 1000; display: none; max-height: 300px; overflow-y: auto; width: calc(100% - 2rem);"></div>
                     </div>
 
                     <!-- Tabel Keranjang -->
@@ -73,10 +75,11 @@
                                 <i class="fas fa-search"></i>
                             </button>
                             <button class="btn btn-outline-danger" onclick="hapusMembership()" title="Hapus membership">
-                                <i class="fas fa-times"></i>
+                                <i class="fas fa-trash"></i>
                             </button>
                         </div>
                         <small class="text-muted d-block mt-1" id="memberInfo"></small>
+                        <div id="hasilMembership" class="list-group position-absolute" style="z-index: 1000; display: none; max-height: 200px; overflow-y: auto; width: calc(100% - 2rem);"></div>
                     </div>
 
                     <hr>
@@ -241,29 +244,64 @@ document.addEventListener('keydown', function(e) {
 });
 
 // Cari produk
+// Cari produk dengan dropdown
 function cariProduk() {
     const keyword = document.getElementById('barcodeInput').value.trim();
     if (!keyword) {
-        alert('Masukkan barcode atau nama produk!');
+        document.getElementById('hasilPencarian').style.display = 'none';
         return;
     }
 
     fetch(`/pos/cari-produk?keyword=${encodeURIComponent(keyword)}`)
         .then(response => response.json())
         .then(data => {
+            const hasil = document.getElementById('hasilPencarian');
+            
             if (data.success) {
-                tambahKeKeranjang(data.data);
-                document.getElementById('barcodeInput').value = '';
-                document.getElementById('barcodeInput').focus();
+                // Cek apakah data adalah array (multiple results)
+                if (Array.isArray(data.data)) {
+                    // Tampilkan dropdown
+                    let html = '';
+                    data.data.forEach(produk => {
+                        html += `
+                            <a href="#" class="list-group-item list-group-item-action" onclick='pilihProduk(${JSON.stringify(produk)}); return false;'>
+                                <div class="d-flex justify-content-between">
+                                    <div>
+                                        <strong>${produk.nama_produk}</strong><br>
+                                        <small class="text-muted">Stok: ${produk.stok}</small>
+                                    </div>
+                                    <div class="text-end">
+                                        <strong>Rp ${formatRupiah(produk.harga_jual)}</strong>
+                                    </div>
+                                </div>
+                            </a>
+                        `;
+                    });
+                    hasil.innerHTML = html;
+                    hasil.style.display = 'block';
+                } else {
+                    // Single result - langsung tambah
+                    tambahKeKeranjang(data.data);
+                    document.getElementById('barcodeInput').value = '';
+                    hasil.style.display = 'none';
+                }
             } else {
                 alert(data.message);
-                document.getElementById('barcodeInput').select();
+                hasil.style.display = 'none';
             }
         })
         .catch(error => {
             console.error('Error:', error);
             alert('Terjadi kesalahan saat mencari produk');
         });
+}
+
+// Pilih produk dari dropdown
+function pilihProduk(produk) {
+    tambahKeKeranjang(produk);
+    document.getElementById('barcodeInput').value = '';
+    document.getElementById('hasilPencarian').style.display = 'none';
+    document.getElementById('barcodeInput').focus();
 }
 
 // Tambah ke keranjang
@@ -392,32 +430,57 @@ function hapusItem(index) {
     }
 }
 
-// Cari membership
+//Cari membership
 function cariMembership() {
     const keyword = document.getElementById('membershipInput').value.trim();
     if (!keyword) {
-        alert('Masukkan nama membership!');
+        document.getElementById('hasilMembership').style.display = 'none';
         return;
     }
 
     fetch(`/pos/cari-membership?keyword=${encodeURIComponent(keyword)}`)
         .then(response => response.json())
         .then(data => {
+            const hasil = document.getElementById('hasilMembership');
+            
             if (data.success) {
-                membershipData = data.data;
-                document.getElementById('memberInfo').innerHTML = 
-                    `<i class="fas fa-check-circle text-success"></i> <strong>${data.data.nama}</strong> (Diskon ${data.data.diskon_persen}%)`;
-                hitungTotal();
+                if (Array.isArray(data.data)) {
+                    // Tampilkan dropdown
+                    let html = '';
+                    data.data.forEach(member => {
+                        html += `
+                            <a href="#" class="list-group-item list-group-item-action" onclick='pilihMembership(${JSON.stringify(member)}); return false;'>
+                                <strong>${member.nama}</strong><br>
+                                <small class="text-success">Diskon: ${member.diskon_persen}%</small>
+                            </a>
+                        `;
+                    });
+                    hasil.innerHTML = html;
+                    hasil.style.display = 'block';
+                } else {
+                    // Single result
+                    pilihMembership(data.data);
+                    hasil.style.display = 'none';
+                }
             } else {
                 alert(data.message);
-                membershipData = null;
-                document.getElementById('memberInfo').innerHTML = '';
+                hasil.style.display = 'none';
             }
         })
         .catch(error => {
             console.error('Error:', error);
             alert('Terjadi kesalahan saat mencari membership');
         });
+}
+
+// Pilih membership dari dropdown
+function pilihMembership(member) {
+    membershipData = member;
+    document.getElementById('membershipInput').value = member.nama;
+    document.getElementById('memberInfo').innerHTML = 
+        `<i class="fas fa-check-circle text-success"></i> <strong>${member.nama}</strong> (Diskon ${member.diskon_persen}%)`;
+    document.getElementById('hasilMembership').style.display = 'none';
+    hitungTotal();
 }
 
 // Hapus membership
@@ -487,6 +550,7 @@ function hitungKembalian() {
 }
 
 // Proses transaksi
+// FUNGSI PROSES TRANSAKSI - VERSI SEDERHANA TANPA MODAL
 function prosesTransaksi() {
     if (keranjang.length === 0) {
         alert('Keranjang masih kosong!');
@@ -505,35 +569,43 @@ function prosesTransaksi() {
     const subtotal = parseFloat(document.getElementById('subtotalText').textContent.replace(/[^0-9]/g, ''));
     const diskon = parseFloat(document.getElementById('diskonText').textContent.replace(/[^0-9]/g, ''));
 
-    const data = {
-        items: keranjang.map(item => ({
-            produk_id: item.id,
-            qty: item.qty,
-            harga: item.harga
-        })),
-        membership_id: membershipData ? membershipData.id : null,
-        subtotal: subtotal,
-        diskon: diskon,
-        total_bayar: total,
-        uang_dibayar: bayar,
-        _token: '{{ csrf_token() }}'
-    };
-
-    // Show loading
-    const loadingModal = new bootstrap.Modal(document.getElementById('loadingModal'));
-    loadingModal.show();
+    // Disable tombol proses agar tidak double click
+    const btnProses = event.target;
+    btnProses.disabled = true;
+    btnProses.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Memproses...';
 
     fetch('/pos/proses', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+            'Accept': 'application/json'
         },
-        body: JSON.stringify(data)
+        body: JSON.stringify({
+            items: keranjang.map(item => ({
+                produk_id: item.id,
+                qty: item.qty,
+                harga: item.harga
+            })),
+            membership_id: membershipData ? membershipData.id : null,
+            subtotal: subtotal,
+            diskon: diskon,
+            total_bayar: total,
+            uang_dibayar: bayar
+        })
     })
-    .then(response => response.json())
+    .then(response => {
+        if (!response.ok) {
+            return response.json().then(err => {
+                throw new Error(err.message || 'Network response was not ok');
+            });
+        }
+        return response.json();
+    })
     .then(data => {
-        loadingModal.hide();
+        // Enable tombol kembali
+        btnProses.disabled = false;
+        btnProses.innerHTML = '<i class="fas fa-check-circle me-2"></i> PROSES BAYAR';
         
         if (data.success) {
             const kembalian = data.data.kembalian;
@@ -550,9 +622,12 @@ function prosesTransaksi() {
         }
     })
     .catch(error => {
-        loadingModal.hide();
+        // Enable tombol kembali
+        btnProses.disabled = false;
+        btnProses.innerHTML = '<i class="fas fa-check-circle me-2"></i> PROSES BAYAR';
+        
         console.error('Error:', error);
-        alert('Terjadi kesalahan saat memproses transaksi');
+        alert('Terjadi kesalahan: ' + error.message);
     });
 }
 

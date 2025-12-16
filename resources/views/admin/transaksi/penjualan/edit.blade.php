@@ -11,18 +11,24 @@
                 <!-- Header -->
                 <div class="row mb-3">
                     <div class="col-md-3">
-                        <label>Pelanggan</label>
-                        <select name="pelanggan_id" class="form-control" id="pelanggan-select">
-                            <option value="">-- Umum --</option>
-                            @foreach($pelanggans as $p)
-                                <option value="{{ $p->id }}"
-                                        data-diskon="{{ $p->membership?->diskon_persen ?? 0 }}"
-                                        {{ $p->id == $transaksi->pelanggan_id ? 'selected' : '' }}>
-                                    {{ $p->nama }} @if($p->membership) ({{ $p->membership->nama_membership }}) @endif
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
+    <label class="form-label">Pelanggan</label>
+    <select name="pelanggan_id" class="form-control" id="pelanggan-select" required>
+        <option value="{{ $pelangganUmum->id }}" 
+                data-diskon="0" 
+                {{ old('pelanggan_id', $transaksiPenjualan->pelanggan_id ?? $pelangganUmum->id) == $pelangganUmum->id ? 'selected' : '' }}>
+            Umum (Non Member)
+        </option>
+        @foreach($pelanggans as $p)
+            @if($p->nama !== 'Umum') {{-- agar Umum tidak muncul 2x --}}
+                <option value="{{ $p->id }}"
+                        data-diskon="{{ $p->membership?->diskon_persen ?? 0 }}"
+                        {{ old('pelanggan_id', $transaksiPenjualan->pelanggan_id ?? null) == $p->id ? 'selected' : '' }}>
+                    {{ $p->nama }} @if($p->membership) ({{ $p->membership->nama_membership }}) @endif
+                </option>
+            @endif
+        @endforeach
+    </select>
+</div>
                     <div class="col-md-3">
                         <label>Karyawan <span class="text-danger">*</span></label>
                         <select name="karyawan_id" class="form-control" required>

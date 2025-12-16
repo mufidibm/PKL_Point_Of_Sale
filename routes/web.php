@@ -46,6 +46,15 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     // Retur
     Route::resource('retur-penjualan', ReturPenjualanController::class);
     Route::resource('retur-pembelian', ReturPembelianController::class);
+
+    //POS
+    Route::prefix('pos')->group(function () {
+    Route::get('/kasir', [KasirController::class, 'index'])->name('pos.index');
+    Route::get('/cari-produk', [KasirController::class, 'cariProduk']);
+    Route::get('/cari-membership', [KasirController::class, 'cariMembership']);
+    Route::post('/proses', [KasirController::class, 'prosesTransaksi']);
+    Route::get('/cetak-struk/{id}', [KasirController::class, 'cetakStruk']);
+});
 });
 
 //pelanggan
@@ -71,15 +80,6 @@ Route::get('/laporan/export/{type}', [LaporanController::class, 'export'])->name
 Route::prefix('transaksi')->name('transaksi.')->group(function () {
     Route::resource('penjualan', TransaksiPenjualanController::class);
     Route::resource('pembelian', TransaksiPembelianController::class);
-});
-
-
-Route::prefix('pos')->group(function () {
-    Route::get('/kasir', [KasirController::class, 'index'])->name('pos.index');
-    Route::get('/cari-produk', [KasirController::class, 'cariProduk']);
-    Route::get('/cari-membership', [KasirController::class, 'cariMembership']);
-    Route::post('/proses', [KasirController::class, 'prosesTransaksi']);
-    Route::get('/cetak-struk/{id}', [KasirController::class, 'cetakStruk']);
 });
 
 // Tambahkan route ini di dalam group admin middleware

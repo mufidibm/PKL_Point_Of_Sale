@@ -23,7 +23,7 @@
                         <th>Pelanggan</th>
                         <th>Karyawan</th>
                         <th>Subtotal</th>
-                        <th>Diskon</th>
+                        <th>Diskon</th> 
                         <th>Total</th>
                         <th>Aksi</th>
                     </tr>

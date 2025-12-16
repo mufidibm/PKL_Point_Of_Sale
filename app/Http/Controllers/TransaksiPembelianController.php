@@ -31,7 +31,7 @@ class TransaksiPembelianController extends Controller
     {
         $request->validate([
             'supplier_id' => 'required|exists:suppliers,id',
-            'karyawan_id' => 'required|exists:karyawan,id',
+            'karyawan_id' => 'required|exists:karyawans,id',
             'tanggal' => 'required|date',
             'items.*.produk_id' => 'required|exists:produks,id',
             'items.*.jumlah' => 'required|integer|min:1',
@@ -86,7 +86,7 @@ public function update(Request $request, TransaksiPembelian $transaksiPembelian)
 {
     $request->validate([
         'supplier_id' => 'required|exists:suppliers,id',
-        'karyawan_id' => 'required|exists:karyawan,id',
+        'karyawan_id' => 'required|exists:karyawans,id',
         'tanggal' => 'required|date',
         'items.*.produk_id' => 'required|exists:produks,id',
         'items.*.jumlah' => 'required|integer|min:1',

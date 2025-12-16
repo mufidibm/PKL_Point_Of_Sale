@@ -17,7 +17,7 @@ class KasirController extends Controller
         return view('pos.index');
     }
 
-    // Scan/cari produk by barcode atau nama
+    
     public function cariProduk(Request $request)
     {
         $keyword = $request->keyword;
@@ -25,67 +25,74 @@ class KasirController extends Controller
         $produk = Produk::where('barcode', $keyword)
             ->orWhere('nama_produk', 'LIKE', "%{$keyword}%")
             ->with(['kategori', 'stokGudang'])
-            ->first();
+            ->get();
 
-        if (!$produk) {
+        if ($produk->isEmpty()) {
             return response()->json([
                 'success' => false,
                 'message' => 'Produk tidak ditemukan'
             ], 404);
         }
 
-        // Cek stok tersedia
-        $stokTersedia = $produk->stokGudang->sum('jumlah_stok');
+        $data = $produk->map(function($p) {
+            $stokTersedia = $p->stokGudang ? $p->stokGudang->sum('jumlah_stok') : 0;
+            
+            return [
+                'id' => $p->id,
+                'nama_produk' => $p->nama_produk,
+                'barcode' => $p->barcode,
+                'harga_jual' => $p->harga_jual,
+                'kategori' => $p->kategori ? $p->kategori->nama_kategori : '-',
+                'stok' => $stokTersedia,
+                'diskon' => $p->diskon ?? 0
+            ];
+        });
 
         return response()->json([
             'success' => true,
-            'data' => [
-                'id' => $produk->id,
-                'nama_produk' => $produk->nama_produk,
-                'barcode' => $produk->barcode,
-                'harga_jual' => $produk->harga_jual,
-                'kategori' => $produk->kategori->nama_kategori ?? '-',
-                'stok' => $stokTersedia,
-                'diskon' => $produk->diskon ?? 0
-            ]
+            'data' => $data
         ]);
     }
 
-    // Cari membership by nama
     public function cariMembership(Request $request)
     {
         $keyword = $request->keyword;
         
         $membership = Membership::where('nama_membership', 'LIKE', "%{$keyword}%")
-            ->orWhere('nama_membership', $keyword)
-            ->first();
+            ->limit(10)
+            ->get();
 
-        if (!$membership) {
+        if ($membership->isEmpty()) {
             return response()->json([
                 'success' => false,
                 'message' => 'Membership tidak ditemukan'
             ], 404);
         }
 
+        $data = $membership->map(function($m) {
+            return [
+                'id' => $m->id,
+                'nama' => $m->nama_membership,
+                'diskon_persen' => $m->diskon_persen ?? 0
+            ];
+        });
+
         return response()->json([
             'success' => true,
-            'data' => [
-                'id' => $membership->id,
-                'nama' => $membership->nama_membership,
-                'diskon_persen' => $membership->diskon_persen ?? 0
-            ]
+            'data' => $data
         ]);
     }
 
-    // Proses transaksi
+    // PERBAIKAN: Validation disesuaikan dengan nama tabel
     public function prosesTransaksi(Request $request)
     {
+        // Validasi dengan nama tabel yang benar
         $request->validate([
             'items' => 'required|array',
-            'items.*.produk_id' => 'required|exists:produk,id',
+            'items.*.produk_id' => 'required|exists:produks,id', // ← PERBAIKAN: produks bukan produk
             'items.*.qty' => 'required|numeric|min:1',
             'items.*.harga' => 'required|numeric',
-            'membership_id' => 'nullable|exists:membership,id',
+            'membership_id' => 'nullable|exists:memberships,id', // ← PERBAIKAN: memberships
             'subtotal' => 'required|numeric',
             'diskon' => 'nullable|numeric',
             'total_bayar' => 'required|numeric',
@@ -94,18 +101,26 @@ class KasirController extends Controller
 
         DB::beginTransaction();
         try {
-            // Buat transaksi penjualan
-            $transaksi = TransaksiPenjualan::create([
+            // Data transaksi
+            $dataTransaksi = [
                 'no_invoice' => $this->generateNoInvoice(),
                 'tanggal' => now(),
-                'membership_id' => $request->membership_id,
-                'pelanggan_id' => $request->membership_id, // Asumsi membership = pelanggan
                 'subtotal' => $request->subtotal,
                 'diskon' => $request->diskon ?? 0,
                 'total_bayar' => $request->total_bayar,
                 'metode_bayar' => $request->metode_bayar ?? 'tunai',
-                'status' => 'selesai'
-            ]);
+                'status' => 'selesai',
+                'karyawan_id' => auth()->id() // ← User yang login sebagai kasir
+            ];
+
+            // Tambahkan membership_id dan pelanggan_id hanya jika ada
+            if ($request->membership_id) {
+                $dataTransaksi['membership_id'] = $request->membership_id;
+                $dataTransaksi['pelanggan_id'] = $request->membership_id;
+            }
+            
+            // Buat transaksi penjualan
+            $transaksi = TransaksiPenjualan::create($dataTransaksi);
 
             // Simpan detail penjualan
             foreach ($request->items as $item) {
@@ -113,7 +128,7 @@ class KasirController extends Controller
                     'transaksi_id' => $transaksi->id,
                     'produk_id' => $item['produk_id'],
                     'jumlah' => $item['qty'],
-                    'harga_jual' => $item['harga'],
+                    'harga_satuan' => $item['harga'],  // ← PERBAIKAN: tambah harga_satuan
                     'subtotal' => $item['qty'] * $item['harga']
                 ]);
 
@@ -133,8 +148,17 @@ class KasirController extends Controller
                 ]
             ]);
 
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            DB::rollback();
+            return response()->json([
+                'success' => false,
+                'message' => 'Validasi gagal',
+                'errors' => $e->errors()
+            ], 422);
+            
         } catch (\Exception $e) {
             DB::rollback();
+            \Log::error('Transaction Error: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
                 'message' => 'Transaksi gagal: ' . $e->getMessage()
@@ -142,7 +166,6 @@ class KasirController extends Controller
         }
     }
 
-    // Generate nomor invoice
     private function generateNoInvoice()
     {
         $tanggal = date('Ymd');
@@ -160,7 +183,6 @@ class KasirController extends Controller
         return 'INV' . $tanggal . str_pad($newNumber, 4, '0', STR_PAD_LEFT);
     }
 
-    // Kurangi stok produk
     private function kurangiStok($produkId, $qty)
     {
         $stokGudang = StokGudang::where('produk_id', $produkId)
@@ -184,7 +206,6 @@ class KasirController extends Controller
         }
     }
 
-    // Cetak struk
     public function cetakStruk($id)
     {
         $transaksi = TransaksiPenjualan::with(['detailPenjualan.produk', 'membership'])
