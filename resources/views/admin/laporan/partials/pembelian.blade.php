@@ -3,21 +3,24 @@
         <h5>Laporan Pembelian</h5>
         <div>
             <a href="{{ route('laporan.export', [
-                    'type' => 'pembelian',
-                    'tanggal_mulai' => $mulai,
-                    'tanggal_selesai' => $selesai,
-                    'format' => 'pdf'
-                ]) }}" class="btn btn-sm btn-danger">PDF</a>
+    'type' => 'pembelian',
+    'tanggal_mulai' => $mulai,
+    'tanggal_selesai' => $selesai,
+    'format' => 'pdf'
+]) }}"
+               class="btn btn-sm btn-danger">PDF</a>
             <a href="{{ route('laporan.export', [
-                    'type' => 'pembelian',
-                    'tanggal_mulai' => $mulai,
-                    'tanggal_selesai' => $selesai,
-                    'format' => 'excel'
-                ]) }}" class="btn btn-sm btn-success">Excel</a>
+    'type' => 'pembelian',
+    'tanggal_mulai' => $mulai,
+    'tanggal_selesai' => $selesai,
+    'format' => 'excel'
+]) }}"
+               class="btn btn-sm btn-success">Excel</a>
         </div>
     </div>
     <div class="card-body">
-        <canvas id="chartPembelian" height="100"></canvas>
+        <canvas id="chartPembelian"
+                height="100"></canvas>
         <hr>
         <table class="table table-sm table-bordered">
             <thead>
@@ -39,9 +42,16 @@
                         <td>Rp {{ number_format($t->total_bayar, 0, ',', '.') }}</td>
                     </tr>
                 @empty
-                    <tr><td colspan="5" class="text-center">Tidak ada data</td></tr>
+                    <tr>
+                        <td colspan="5"
+                            class="text-center">Tidak ada data</td>
+                    </tr>
                 @endforelse
             </tbody>
         </table>
+
+        <div class="d-flex justify-content-center mt-4">
+            {{ $pembelian->links() }}
+        </div>
     </div>
 </div>

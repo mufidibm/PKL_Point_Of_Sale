@@ -73,8 +73,6 @@ Route::resource('gudang', GudangController::class);
     // Laporan (sesuai yang kamu punya)
     Route::get('/laporan', [LaporanController::class, 'index'])->name('laporan.index');
     Route::get('/laporan/export/{type}', [LaporanController::class, 'export'])->name('laporan.export');
-});
-
 // === POS / KASIR (bisa diakses oleh kasir nanti tinggal tambah role:kasir) ===
 
 Route::middleware('auth')->group(function () {

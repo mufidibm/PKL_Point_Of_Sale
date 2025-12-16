@@ -208,7 +208,7 @@ class KasirController extends Controller
 
     public function cetakStruk($id)
     {
-        $transaksi = TransaksiPenjualan::with(['detailPenjualan.produk', 'membership'])
+        $transaksi = TransaksiPenjualan::with(['detailPenjualans.produk', 'membership'])
             ->findOrFail($id);
 
         return view('pos.struk', compact('transaksi'));

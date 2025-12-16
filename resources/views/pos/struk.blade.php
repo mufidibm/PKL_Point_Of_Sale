@@ -234,7 +234,7 @@
 
         <!-- Daftar Item -->
         <div class="items">
-            @foreach($transaksi->detailPenjualan as $detail)
+            @foreach($transaksi->detailPenjualans as $detail)
             <div class="item">
                 <div class="item-name">{{ $detail->produk->nama_produk }}</div>
                 <div class="item-detail">
