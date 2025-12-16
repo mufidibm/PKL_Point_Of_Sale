@@ -42,8 +42,6 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::resource('produk', ProdukController::class);
     Route::resource('kategori', KategoriController::class);
     Route::resource('supplier', SupplierController::class);
-    Route::resource('pelanggan', PelangganController::class);
-    Route::resource('gudang', GudangController::class);
     Route::resource('stokgudang', StokController::class);
     Route::resource('karyawan', KaryawanController::class);
     Route::resource('membership', MembershipController::class);
@@ -56,19 +54,28 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::resource('retur-penjualan', ReturPenjualanController::class);
     Route::resource('retur-pembelian', ReturPembelianController::class);
 
+    //POS
+    Route::prefix('pos')->group(function () {
+    Route::get('/kasir', [KasirController::class, 'index'])->name('pos.index');
+    Route::get('/cari-produk', [KasirController::class, 'cariProduk']);
+    Route::get('/cari-membership', [KasirController::class, 'cariMembership']);
+    Route::post('/proses', [KasirController::class, 'prosesTransaksi']);
+    Route::get('/cetak-struk/{id}', [KasirController::class, 'cetakStruk']);
+});
+});
+
+//pelanggan
+Route::resource('pelanggan', PelangganController::class);
+
+//Gudang
+Route::resource('gudang', GudangController::class);
+
     // Laporan (sesuai yang kamu punya)
     Route::get('/laporan', [LaporanController::class, 'index'])->name('laporan.index');
     Route::get('/laporan/export/{type}', [LaporanController::class, 'export'])->name('laporan.export');
 });
 
 // === POS / KASIR (bisa diakses oleh kasir nanti tinggal tambah role:kasir) ===
-Route::middleware('auth')->prefix('pos')->name('pos.')->group(function () {
-    Route::get('/kasir', [KasirController::class, 'index'])->name('index');
-    Route::get('/cari-produk', [KasirController::class, 'cariProduk'])->name('cari-produk');
-    Route::get('/cari-membership', [KasirController::class, 'cariMembership'])->name('cari-membership');
-    Route::post('/proses', [KasirController::class, 'prosesTransaksi'])->name('proses');
-    Route::get('/cetak-struk/{id}', [KasirController::class, 'cetakStruk'])->name('cetak-struk');
-});
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

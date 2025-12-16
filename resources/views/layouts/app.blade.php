@@ -16,22 +16,35 @@
         @endif
     </title>
 
-    <!-- CSS AdminLTE + plugin -->
-    <link rel="stylesheet"
-          href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
-    <link rel="stylesheet"
-          href="{{ asset('adminlte/plugins/fontawesome-free/css/all.min.css') }}">
-    <link rel="stylesheet"
-          href="{{ asset('adminlte/dist/css/adminlte.min.css') }}">
-    <link rel="stylesheet"
-          href="{{ asset('adminlte/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css') }}">
-    <link rel="stylesheet"
-          href="{{ asset('adminlte/plugins/select2/css/select2.min.css') }}">
-    <link rel="stylesheet"
-          href="{{ asset('adminlte/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css') }}">
+<!-- Fonts -->
+<link rel="dns-prefetch" href="//fonts.bunny.net">
+<link href="https://fonts.bunny.net/css?family=Nunito" rel="stylesheet">
 
-    @stack('styles')
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+<!-- Google Font: Source Sans Pro (AdminLTE) -->
+<link rel="stylesheet"
+      href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+
+<!-- Font Awesome -->
+<link rel="stylesheet"
+      href="{{ asset('adminlte/plugins/fontawesome-free/css/all.min.css') }}">
+
+<!-- AdminLTE -->
+<link rel="stylesheet"
+      href="{{ asset('adminlte/dist/css/adminlte.min.css') }}">
+
+<!-- Plugins -->
+<link rel="stylesheet"
+      href="{{ asset('adminlte/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css') }}">
+<link rel="stylesheet"
+      href="{{ asset('adminlte/plugins/select2/css/select2.min.css') }}">
+<link rel="stylesheet"
+      href="{{ asset('adminlte/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css') }}">
+
+@stack('styles')
+
+<!-- Vite -->
+@vite(['resources/css/app.css'])
+
 </head>
 
 <body class="hold-transition sidebar-mini layout-fixed">
