@@ -46,6 +46,10 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::resource('stokgudang', StokController::class);
     Route::resource('karyawan', KaryawanController::class);
     Route::resource('membership', MembershipController::class);
+    Route::resource('stok', StokController::class);
+    Route::resource('laporan', LaporanController::class);
+    ;
+});
 
     // Transaksi
     Route::resource('penjualan', TransaksiPenjualanController::class);
@@ -55,7 +59,7 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::resource('retur-penjualan', ReturPenjualanController::class);
     Route::resource('retur-pembelian', ReturPembelianController::class);
     // Laporan (sesuai yang kamu punya)
-    Route::get('/laporan', [LaporanController::class, 'index'])->name('laporan.index');
+    //Route::get('/laporan', [LaporanController::class, 'index'])->name('laporan.index');
     Route::get('/laporan/export/{type}', [LaporanController::class, 'export'])->name('laporan.export');
 
     Route::get('/settings', [SettingController::class, 'index'])->name('settings.index');

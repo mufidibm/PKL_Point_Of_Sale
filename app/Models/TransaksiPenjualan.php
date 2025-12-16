@@ -42,6 +42,11 @@ class TransaksiPenjualan extends Model
         return $this->belongsTo(Karyawan::class);
     }
 
+    public function membership()
+    {
+        return $this->belongsTo(Membership::class, 'membership_id');
+    }
+
     public function pelanggan()
     {
         return $this->belongsTo(Pelanggan::class);
