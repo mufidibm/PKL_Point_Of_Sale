@@ -10,18 +10,19 @@ return new class extends Migration {
         Schema::create('settings', function (Blueprint $table) {
             $table->id();
             $table->string('nama_toko');
+            $table->string('logo')->nullable(); // Tambahan untuk logo
             $table->text('alamat')->nullable();
             $table->string('telepon')->nullable();
             $table->string('email')->nullable();
-            $table->text('footer_note1')->nullable(); // misal: Barang yang sudah dibeli...
-            $table->text('footer_note2')->nullable(); // misal: Selamat Berbelanja Kembali
+            $table->text('footer_note1')->nullable();
+            $table->text('footer_note2')->nullable();
             $table->string('thank_you_message')->default('*** TERIMA KASIH ***');
             $table->timestamps();
         });
 
-        // Insert data default (opsional)
         \DB::table('settings')->insert([
             'nama_toko' => 'NAMA TOKO ANDA',
+            'logo' => null,
             'alamat' => 'Jl. Alamat Toko No. 123',
             'telepon' => '(021) 1234-5678',
             'email' => 'toko@email.com',

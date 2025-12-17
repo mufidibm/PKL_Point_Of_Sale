@@ -47,32 +47,32 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::resource('karyawan', KaryawanController::class);
     Route::resource('membership', MembershipController::class);
     Route::resource('stok', StokController::class);
-    Route::resource('laporan', LaporanController::class);
-    ;
-});
-
-    // Transaksi
-    Route::resource('penjualan', TransaksiPenjualanController::class);
-    Route::resource('pembelian', TransaksiPembelianController::class);
-
-    // Retur
-    Route::resource('retur-penjualan', ReturPenjualanController::class);
-    Route::resource('retur-pembelian', ReturPembelianController::class);
-    // Laporan (sesuai yang kamu punya)
-    //Route::get('/laporan', [LaporanController::class, 'index'])->name('laporan.index');
-    Route::get('/laporan/export/{type}', [LaporanController::class, 'export'])->name('laporan.export');
+    Route::resource('laporan', LaporanController::class);;
 
     Route::get('/settings', [SettingController::class, 'index'])->name('settings.index');
     Route::post('/settings', [SettingController::class, 'update'])->name('settings.update');
+    Route::delete('/settings/delete-logo', [SettingController::class, 'deleteLogo'])->name('settings.delete-logo');
+});
 
-    //POS
-    Route::prefix('pos')->group(function () {
-        Route::get('/kasir', [KasirController::class, 'index'])->name('pos.index');
-        Route::get('/cari-produk', [KasirController::class, 'cariProduk']);
-        Route::get('/cari-membership', [KasirController::class, 'cariMembership']);
-        Route::post('/proses', [KasirController::class, 'prosesTransaksi']);
-        Route::get('/cetak-struk/{id}', [KasirController::class, 'cetakStruk']);
-    });
+// Transaksi
+Route::resource('penjualan', TransaksiPenjualanController::class);
+Route::resource('pembelian', TransaksiPembelianController::class);
+
+// Retur
+Route::resource('retur-penjualan', ReturPenjualanController::class);
+Route::resource('retur-pembelian', ReturPembelianController::class);
+// Laporan (sesuai yang kamu punya)
+//Route::get('/laporan', [LaporanController::class, 'index'])->name('laporan.index');
+Route::get('/laporan/export/{type}', [LaporanController::class, 'export'])->name('laporan.export');
+
+//POS
+Route::prefix('pos')->group(function () {
+    Route::get('/kasir', [KasirController::class, 'index'])->name('pos.index');
+    Route::get('/cari-produk', [KasirController::class, 'cariProduk']);
+    Route::get('/cari-membership', [KasirController::class, 'cariMembership']);
+    Route::post('/proses', [KasirController::class, 'prosesTransaksi']);
+    Route::get('/cetak-struk/{id}', [KasirController::class, 'cetakStruk']);
+});
 
 //pelanggan
 Route::resource('pelanggan', PelangganController::class);

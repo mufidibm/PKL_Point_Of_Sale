@@ -1,11 +1,23 @@
+@php
+    $settings = $settings ?? \App\Models\Setting::getSettings();
+@endphp
 <aside class="main-sidebar sidebar-dark-primary elevation-4">
     <!-- Brand Logo -->
     <a href="{{ route('dashboard') }}"
        class="brand-link">
-        <img src="{{ asset('adminlte/dist/img/AdminLTELogo.png') }}"
-             alt="Logo"
-             class="brand-image img-circle elevation-3">
-        <span class="brand-text font-weight-light">POS System</span>
+        {{-- Ganti logo default dengan logo toko jika ada --}}
+        @if($settings->logo)
+            <img src="{{ $settings->logo_url }}"
+                 alt="{{ $settings->nama_toko }}"
+                 class="brand-image img-circle elevation-3"
+                 style="opacity: .8">
+        @else
+            <img src="{{ asset('adminlte/dist/img/AdminLTELogo.png') }}"
+                 alt="Logo"
+                 class="brand-image img-circle elevation-3"
+                 style="opacity: .8">
+        @endif
+        <span class="brand-text font-weight-light">{{ $settings->nama_toko }}</span>
     </a>
 
     <!-- Sidebar -->
@@ -28,83 +40,83 @@
 
                 {{-- MASTER DATA --}}
                 @if(Auth::user()->role === 'admin')
-                <li
-                    class="nav-item {{ request()->is('produk*', 'kategori*', 'supplier*', 'gudang*', 'stokgudang*', 'karyawan*', 'pelanggan*', 'membership*', 'user*') ? 'menu-open' : '' }}">
-                    <a href="#"
-                       class="nav-link">
-                        <i class="nav-icon fas fa-database"></i>
-                        <p>
-                            Master Data
-                            <i class="right fas fa-angle-left"></i>
-                        </p>
-                    </a>
+                    <li
+                        class="nav-item {{ request()->is('produk*', 'kategori*', 'supplier*', 'gudang*', 'stokgudang*', 'karyawan*', 'pelanggan*', 'membership*', 'user*') ? 'menu-open' : '' }}">
+                        <a href="#"
+                           class="nav-link">
+                            <i class="nav-icon fas fa-database"></i>
+                            <p>
+                                Master Data
+                                <i class="right fas fa-angle-left"></i>
+                            </p>
+                        </a>
 
-                    <ul class="nav nav-treeview">
-                        <li class="nav-item">
-                            <a href="{{ route('user.index') }}"
-                               class="nav-link {{ request()->is('user*') ? 'active' : '' }}">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>User</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{{ route('produk.index') }}"
-                               class="nav-link {{ request()->is('produk*') ? 'active' : '' }}">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Produk</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{{ route('kategori.index') }}"
-                               class="nav-link {{ request()->is('kategori*') ? 'active' : '' }}">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Kategori</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{{ route('supplier.index') }}"
-                               class="nav-link {{ request()->is('supplier*') ? 'active' : '' }}">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Supplier</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{{ route('gudang.index') }}"
-                               class="nav-link {{ request()->is('gudang*') ? 'active' : '' }}">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Gudang</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{{ route('stokgudang.index') }}"
-                               class="nav-link {{ request()->is('stok*') ? 'active' : '' }}">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Stok Gudang</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{{ route('karyawan.index') }}"
-                               class="nav-link {{ request()->is('karyawan*') ? 'active' : '' }}">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Karyawan</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{{ route('pelanggan.index') }}"
-                               class="nav-link {{ request()->is('pelanggan*') ? 'active' : '' }}">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Pelanggan</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{{ route('membership.index') }}"
-                               class="nav-link {{ request()->is('membership*') ? 'active' : '' }}">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Membership</p>
-                            </a>
-                        </li>
-                    </ul>
-                </li>
+                        <ul class="nav nav-treeview">
+                            <li class="nav-item">
+                                <a href="{{ route('user.index') }}"
+                                   class="nav-link {{ request()->is('user*') ? 'active' : '' }}">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>User</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('produk.index') }}"
+                                   class="nav-link {{ request()->is('produk*') ? 'active' : '' }}">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Produk</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('kategori.index') }}"
+                                   class="nav-link {{ request()->is('kategori*') ? 'active' : '' }}">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Kategori</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('supplier.index') }}"
+                                   class="nav-link {{ request()->is('supplier*') ? 'active' : '' }}">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Supplier</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('gudang.index') }}"
+                                   class="nav-link {{ request()->is('gudang*') ? 'active' : '' }}">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Gudang</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('stokgudang.index') }}"
+                                   class="nav-link {{ request()->is('stok*') ? 'active' : '' }}">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Stok Gudang</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('karyawan.index') }}"
+                                   class="nav-link {{ request()->is('karyawan*') ? 'active' : '' }}">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Karyawan</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('pelanggan.index') }}"
+                                   class="nav-link {{ request()->is('pelanggan*') ? 'active' : '' }}">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Pelanggan</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('membership.index') }}"
+                                   class="nav-link {{ request()->is('membership*') ? 'active' : '' }}">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Membership</p>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
                 @endif
 
                 {{-- TRANSAKSI --}}
@@ -137,33 +149,33 @@
 
                 {{-- RETUR --}}
                 @if(Auth::user()->role === 'admin')
-                <li class="nav-item {{ request()->is('retur-penjualan*', 'retur-pembelian*') ? 'menu-open' : '' }}">
-                    <a href="#"
-                       class="nav-link">
-                        <i class="nav-icon fas fa-undo"></i>
-                        <p>
-                            Retur
-                            <i class="right fas fa-angle-left"></i>
-                        </p>
-                    </a>
-                    <ul class="nav nav-treeview">
-                        <li class="nav-item">
-                            <a href="{{ route('retur-penjualan.index') }}"
-                               class="nav-link {{ request()->is('retur-penjualan*') ? 'active' : '' }}">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Retur Penjualan</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{{ route('retur-pembelian.index') }}"
-                               class="nav-link {{ request()->is('retur-pembelian*') ? 'active' : '' }}">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Retur Pembelian</p>
-                            </a>
-                        </li>
-                    </ul>
-                </li>
-                  @endif
+                    <li class="nav-item {{ request()->is('retur-penjualan*', 'retur-pembelian*') ? 'menu-open' : '' }}">
+                        <a href="#"
+                           class="nav-link">
+                            <i class="nav-icon fas fa-undo"></i>
+                            <p>
+                                Retur
+                                <i class="right fas fa-angle-left"></i>
+                            </p>
+                        </a>
+                        <ul class="nav nav-treeview">
+                            <li class="nav-item">
+                                <a href="{{ route('retur-penjualan.index') }}"
+                                   class="nav-link {{ request()->is('retur-penjualan*') ? 'active' : '' }}">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Retur Penjualan</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('retur-pembelian.index') }}"
+                                   class="nav-link {{ request()->is('retur-pembelian*') ? 'active' : '' }}">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Retur Pembelian</p>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                @endif
 
                 {{-- KASIR (POS) --}}
                 <li class="nav-item">
@@ -179,13 +191,13 @@
 
                 {{-- LAPORAN --}}
                 @if(Auth::user()->role === 'admin')
-                <li class="nav-item">
-                    <a href="{{ route('laporan.index') }}"
-                       class="nav-link {{ request()->is('laporan*') ? 'active' : '' }}">
-                        <i class="nav-icon fas fa-file-alt"></i>
-                        <p>Laporan</p>
-                    </a>
-                </li>
+                    <li class="nav-item">
+                        <a href="{{ route('laporan.index') }}"
+                           class="nav-link {{ request()->is('laporan*') ? 'active' : '' }}">
+                            <i class="nav-icon fas fa-file-alt"></i>
+                            <p>Laporan</p>
+                        </a>
+                    </li>
                 @endif
 
                 {{-- PENGATURAN TOKO --}}
