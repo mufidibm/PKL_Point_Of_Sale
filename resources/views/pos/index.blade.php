@@ -205,6 +205,14 @@
                     <button type="button" class="btn-close btn-close-white" onclick="tutupModalScanner()"></button>
                 </div>
                 <div class="modal-body">
+                    <!-- Pilih Kamera -->
+                    <div class="mb-3" id="pilihanKamera" style="display: none;">
+                        <label class="form-label fw-bold">Pilih Kamera:</label>
+                        <select class="form-select" id="selectKamera" onchange="gantiKamera()">
+                            <option value="">Memuat daftar kamera...</option>
+                        </select>
+                    </div>
+
                     <!-- Video Preview -->
                     <div class="text-center mb-3">
                         <video id="videoPreview" width="100%" style="max-height: 400px; border-radius: 8px; background: #000;"></video>
@@ -337,7 +345,7 @@
         let codeReader = null;
         let scannerAktif = false;
         let lastScanTime = 0;
-        const SCAN_COOLDOWN = 3500; // 2 detik cooldown
+        const SCAN_COOLDOWN = 2000; // 2 detik cooldown
 
         // Event listener untuk Enter pada barcode
         document.getElementById('barcodeInput').addEventListener('keypress', function (e) {
@@ -435,13 +443,28 @@
                 
                 codeReader = new ZXing.BrowserMultiFormatReader();
                 
-                const videoInputDevices = await codeReader.listVideoInputDevices();
+                videoInputDevices = await codeReader.listVideoInputDevices();
                 
                 if (videoInputDevices.length === 0) {
                     throw new Error('Tidak ada kamera yang terdeteksi');
                 }
 
-                const selectedDeviceId = videoInputDevices[0].deviceId;
+                // Tampilkan dropdown pilihan kamera jika ada lebih dari 1
+                if (videoInputDevices.length > 1) {
+                    const selectKamera = document.getElementById('selectKamera');
+                    selectKamera.innerHTML = '';
+                    
+                    videoInputDevices.forEach((device, index) => {
+                        const option = document.createElement('option');
+                        option.value = device.deviceId;
+                        option.text = device.label || `Kamera ${index + 1}`;
+                        selectKamera.appendChild(option);
+                    });
+                    
+                    document.getElementById('pilihanKamera').style.display = 'block';
+                }
+
+                selectedDeviceId = videoInputDevices[0].deviceId;
                 
                 document.getElementById('scannerLoading').style.display = 'none';
                 document.getElementById('videoPreview').classList.add('active');
@@ -468,6 +491,24 @@
             }
         }
 
+        function gantiKamera() {
+            const selectKamera = document.getElementById('selectKamera');
+            selectedDeviceId = selectKamera.value;
+            
+            if (codeReader && selectedDeviceId) {
+                // Stop scanner yang lama
+                codeReader.reset();
+                
+                // Start dengan kamera baru
+                scannerAktif = true;
+                codeReader.decodeFromVideoDevice(selectedDeviceId, 'videoPreview', (result, err) => {
+                    if (result) {
+                        handleBarcodeScan(result.text);
+                    }
+                });
+            }
+        }
+
         function stopScanner() {
             if (codeReader) {
                 codeReader.reset();
@@ -476,6 +517,7 @@
             document.getElementById('videoPreview').classList.remove('active');
             document.getElementById('scannerLoading').style.display = 'block';
             document.getElementById('statusScan').style.display = 'none';
+            document.getElementById('pilihanKamera').style.display = 'none';
         }
 
         function handleBarcodeScan(barcode) {
