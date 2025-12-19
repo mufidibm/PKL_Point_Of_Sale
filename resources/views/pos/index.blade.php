@@ -14,7 +14,7 @@
                         <div class="mb-4">
                             <label class="form-label fw-bold">Scan Barcode / Cari Produk</label>
                             <div class="input-group input-group-lg">
-                                <span class="input-group-text bg-white">
+                                <span class="input-group-text bg-white" style="cursor: pointer;" onclick="bukaModalScanner()">
                                     <i class="fas fa-barcode text-primary"></i>
                                 </span>
                                 <input type="text"
@@ -27,8 +27,7 @@
                                     <i class="fas fa-search me-1"></i> Cari
                                 </button>
                             </div>
-                            <small class="text-muted"><i class="fas fa-info-circle"></i> Tekan Enter setelah scan
-                                barcode</small>
+                            <small class="text-muted"><i class="fas fa-info-circle"></i> Klik icon barcode untuk scan dengan kamera atau tekan Enter untuk cari</small>
 
                             <div id="hasilPencarian"
                                  class="list-group position-absolute"
@@ -195,6 +194,64 @@
         </div>
     </div>
 
+    <!-- Modal Barcode Scanner -->
+    <div class="modal fade" id="modalScanner" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title">
+                        <i class="fas fa-camera me-2"></i>Scan Barcode Produk
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" onclick="tutupModalScanner()"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Video Preview -->
+                    <div class="text-center mb-3">
+                        <video id="videoPreview" width="100%" style="max-height: 400px; border-radius: 8px; background: #000;"></video>
+                        <div id="scannerLoading" class="mt-3">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                            <p class="mt-2">Memuat kamera...</p>
+                        </div>
+                    </div>
+
+                    <!-- Status Scan -->
+                    <div id="statusScan" class="alert alert-info text-center" style="display: none;">
+                        <i class="fas fa-spinner fa-spin me-2"></i>
+                        <span id="statusText">Siap untuk scan...</span>
+                    </div>
+
+                    <!-- Input Manual Barcode -->
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Atau Masukkan Barcode Manual:</label>
+                        <div class="input-group">
+                            <input type="text" 
+                                   id="barcodeManualInput" 
+                                   class="form-control" 
+                                   placeholder="Ketik kode barcode..."
+                                   onkeypress="if(event.key==='Enter') cariProdukDariBarcode()">
+                            <button class="btn btn-primary" onclick="cariProdukDariBarcode()">
+                                <i class="fas fa-search me-1"></i> Cari
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Hasil Scan Terakhir -->
+                    <div id="hasilScanTerakhir" class="alert alert-success" style="display: none;">
+                        <i class="fas fa-check-circle me-2"></i>
+                        <strong>Berhasil!</strong> Produk ditambahkan ke keranjang
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="tutupModalScanner()">
+                        <i class="fas fa-times me-1"></i> Tutup
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Modal Loading -->
     <div class="modal fade"
          id="loadingModal"
@@ -244,6 +301,14 @@
             width: 35px;
         }
 
+        #videoPreview {
+            display: none;
+        }
+
+        #videoPreview.active {
+            display: block;
+        }
+
         @media print {
             body * {
                 visibility: hidden;
@@ -262,10 +327,17 @@
         }
     </style>
 
+    <!-- Library Barcode Scanner -->
+    <script src="https://unpkg.com/@zxing/library@latest"></script>
+
     <script>
         let keranjang = [];
         let membershipData = null;
         let searchTimeout = null;
+        let codeReader = null;
+        let scannerAktif = false;
+        let lastScanTime = 0;
+        const SCAN_COOLDOWN = 3500; // 2 detik cooldown
 
         // Event listener untuk Enter pada barcode
         document.getElementById('barcodeInput').addEventListener('keypress', function (e) {
@@ -285,7 +357,6 @@
                 return;
             }
 
-            // Debounce 300ms
             searchTimeout = setTimeout(() => {
                 cariProdukRealtime(keyword);
             }, 300);
@@ -311,7 +382,6 @@
                 return;
             }
 
-            // Debounce 300ms
             searchTimeout = setTimeout(() => {
                 cariMembershipRealtime(keyword);
             }, 300);
@@ -319,24 +389,154 @@
 
         // Keyboard shortcuts
         document.addEventListener('keydown', function (e) {
-            // F8 - Focus ke barcode
             if (e.key === 'F8') {
                 e.preventDefault();
                 document.getElementById('barcodeInput').focus();
             }
-            // F9 - Reset keranjang
             if (e.key === 'F9') {
                 e.preventDefault();
                 if (confirm('Reset keranjang?')) {
                     resetKeranjang();
                 }
             }
-            // ESC - Close dropdown
             if (e.key === 'Escape') {
                 document.getElementById('hasilPencarian').style.display = 'none';
                 document.getElementById('hasilMembership').style.display = 'none';
+                if (scannerAktif) {
+                    tutupModalScanner();
+                }
             }
         });
+
+        // ===== BARCODE SCANNER FUNCTIONS =====
+        function bukaModalScanner() {
+            const modal = new bootstrap.Modal(document.getElementById('modalScanner'));
+            modal.show();
+            
+            setTimeout(() => {
+                initScanner();
+            }, 500);
+        }
+
+        function tutupModalScanner() {
+            stopScanner();
+            const modal = bootstrap.Modal.getInstance(document.getElementById('modalScanner'));
+            if (modal) {
+                modal.hide();
+            }
+            document.getElementById('barcodeManualInput').value = '';
+            document.getElementById('hasilScanTerakhir').style.display = 'none';
+        }
+
+        async function initScanner() {
+            try {
+                document.getElementById('scannerLoading').style.display = 'block';
+                document.getElementById('videoPreview').classList.remove('active');
+                
+                codeReader = new ZXing.BrowserMultiFormatReader();
+                
+                const videoInputDevices = await codeReader.listVideoInputDevices();
+                
+                if (videoInputDevices.length === 0) {
+                    throw new Error('Tidak ada kamera yang terdeteksi');
+                }
+
+                const selectedDeviceId = videoInputDevices[0].deviceId;
+                
+                document.getElementById('scannerLoading').style.display = 'none';
+                document.getElementById('videoPreview').classList.add('active');
+                document.getElementById('statusScan').style.display = 'block';
+                document.getElementById('statusText').textContent = 'Arahkan barcode ke kamera...';
+                
+                scannerAktif = true;
+                
+                codeReader.decodeFromVideoDevice(selectedDeviceId, 'videoPreview', (result, err) => {
+                    if (result) {
+                        handleBarcodeScan(result.text);
+                    }
+                });
+                
+            } catch (err) {
+                console.error('Error scanner:', err);
+                document.getElementById('scannerLoading').innerHTML = `
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        Gagal mengakses kamera: ${err.message}
+                        <br><small>Silakan gunakan input manual di bawah</small>
+                    </div>
+                `;
+            }
+        }
+
+        function stopScanner() {
+            if (codeReader) {
+                codeReader.reset();
+                scannerAktif = false;
+            }
+            document.getElementById('videoPreview').classList.remove('active');
+            document.getElementById('scannerLoading').style.display = 'block';
+            document.getElementById('statusScan').style.display = 'none';
+        }
+
+        function handleBarcodeScan(barcode) {
+            const now = Date.now();
+            
+            // Cek cooldown
+            if (now - lastScanTime < SCAN_COOLDOWN) {
+                return;
+            }
+            
+            lastScanTime = now;
+            
+            document.getElementById('statusText').textContent = 'Memproses barcode: ' + barcode;
+            
+            // Cari produk berdasarkan barcode
+            fetch(`/pos/cari-produk?keyword=${encodeURIComponent(barcode)}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const produk = Array.isArray(data.data) ? data.data[0] : data.data;
+                        
+                        // Set qty ke 1
+                        const produkDenganQty1 = {...produk, forceQty: 1};
+                        tambahKeKeranjang(produkDenganQty1);
+                        
+                        // Tampilkan notifikasi sukses
+                        document.getElementById('hasilScanTerakhir').style.display = 'block';
+                        document.getElementById('hasilScanTerakhir').innerHTML = `
+                            <i class="fas fa-check-circle me-2"></i>
+                            <strong>Berhasil!</strong> ${produk.nama_produk} ditambahkan (Qty: 1)
+                        `;
+                        
+                        // Auto hide notifikasi setelah 2 detik
+                        setTimeout(() => {
+                            document.getElementById('hasilScanTerakhir').style.display = 'none';
+                        }, 2000);
+                        
+                        document.getElementById('statusText').textContent = 'Siap scan barcode berikutnya...';
+                    } else {
+                        document.getElementById('statusText').textContent = 'Produk tidak ditemukan!';
+                        setTimeout(() => {
+                            document.getElementById('statusText').textContent = 'Arahkan barcode ke kamera...';
+                        }, 2000);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    document.getElementById('statusText').textContent = 'Error mencari produk!';
+                });
+        }
+
+        function cariProdukDariBarcode() {
+            const barcode = document.getElementById('barcodeManualInput').value.trim();
+            if (!barcode) {
+                alert('Masukkan kode barcode terlebih dahulu');
+                return;
+            }
+            
+            handleBarcodeScan(barcode);
+            document.getElementById('barcodeManualInput').value = '';
+        }
 
         // Cari produk realtime
         function cariProdukRealtime(keyword) {
@@ -427,7 +627,6 @@
                 });
         }
 
-        // Cari produk (untuk tombol cari & enter)
         function cariProduk() {
             const keyword = document.getElementById('barcodeInput').value.trim();
             if (!keyword) {
@@ -437,7 +636,6 @@
             cariProdukRealtime(keyword);
         }
 
-        // Cari membership (untuk tombol cari)
         function cariMembership() {
             const keyword = document.getElementById('membershipInput').value.trim();
             if (!keyword) {
@@ -447,7 +645,6 @@
             cariMembershipRealtime(keyword);
         }
 
-        // Pilih produk dari dropdown
         function pilihProduk(produk) {
             tambahKeKeranjang(produk);
             document.getElementById('barcodeInput').value = '';
@@ -455,7 +652,6 @@
             document.getElementById('barcodeInput').focus();
         }
 
-        // Pilih membership dari dropdown
         function pilihMembership(member) {
             membershipData = member;
             document.getElementById('membershipInput').value = member.nama;
@@ -465,17 +661,25 @@
             hitungTotal();
         }
 
-        // Tambah ke keranjang
         function tambahKeKeranjang(produk) {
             const index = keranjang.findIndex(item => item.id === produk.id);
 
             if (index !== -1) {
-                // Cek stok
-                if (keranjang[index].qty + 1 > produk.stok) {
-                    alert(`Stok tidak cukup! Stok tersedia: ${produk.stok}`);
-                    return;
+                // Jika dari scanner (forceQty), tambah 1
+                if (produk.forceQty) {
+                    if (keranjang[index].qty + 1 > produk.stok) {
+                        alert(`Stok tidak cukup! Stok tersedia: ${produk.stok}`);
+                        return;
+                    }
+                    keranjang[index].qty++;
+                } else {
+                    // Jika dari manual, tambah 1
+                    if (keranjang[index].qty + 1 > produk.stok) {
+                        alert(`Stok tidak cukup! Stok tersedia: ${produk.stok}`);
+                        return;
+                    }
+                    keranjang[index].qty++;
                 }
-                keranjang[index].qty++;
             } else {
                 if (produk.stok < 1) {
                     alert('Stok produk habis!');
@@ -485,7 +689,7 @@
                     id: produk.id,
                     nama: produk.nama_produk,
                     harga: produk.harga_jual,
-                    qty: 1,
+                    qty: 1, // Selalu set 1 untuk produk baru
                     diskon: produk.diskon || 0,
                     stok: produk.stok
                 });
@@ -495,7 +699,6 @@
             hitungTotal();
         }
 
-        // Render keranjang
         function renderKeranjang() {
             const tbody = document.getElementById('keranjangBody');
 
@@ -548,7 +751,6 @@
             tbody.innerHTML = html;
         }
 
-        // Ubah qty
         function ubahQty(index, delta) {
             const newQty = keranjang[index].qty + delta;
 
@@ -567,7 +769,6 @@
             hitungTotal();
         }
 
-        // Set qty manual
         function setQty(index, value) {
             const qty = parseInt(value);
             if (qty > 0 && qty <= keranjang[index].stok) {
@@ -582,7 +783,6 @@
             hitungTotal();
         }
 
-        // Hapus item
         function hapusItem(index) {
             if (confirm('Hapus produk dari keranjang?')) {
                 keranjang.splice(index, 1);
@@ -591,7 +791,6 @@
             }
         }
 
-        // Hapus membership
         function hapusMembership() {
             membershipData = null;
             document.getElementById('membershipInput').value = '';
@@ -599,7 +798,6 @@
             hitungTotal();
         }
 
-        // Hitung total
         function hitungTotal() {
             let subtotal = 0;
             keranjang.forEach(item => {
@@ -620,26 +818,22 @@
             hitungKembalian();
         }
 
-        // Format input rupiah
         function formatInputRupiah(input) {
             let value = input.value.replace(/[^0-9]/g, '');
             input.value = value;
         }
 
-        // Set nominal cepat
         function setNominal(nominal) {
             document.getElementById('uangBayar').value = nominal;
             hitungKembalian();
         }
 
-        // Set uang pas
         function setPasExact() {
             const total = parseFloat(document.getElementById('totalText').textContent.replace(/[^0-9]/g, ''));
             document.getElementById('uangBayar').value = total;
             hitungKembalian();
         }
 
-        // Hitung kembalian
         function hitungKembalian() {
             const total = parseFloat(document.getElementById('totalText').textContent.replace(/[^0-9]/g, ''));
             const bayar = parseFloat(document.getElementById('uangBayar').value) || 0;
@@ -657,7 +851,6 @@
             }
         }
 
-        // Proses transaksi
         function prosesTransaksi() {
             if (keranjang.length === 0) {
                 alert('Keranjang masih kosong!');
@@ -727,7 +920,6 @@
                 });
         }
 
-        // Reset keranjang
         function resetKeranjang() {
             keranjang = [];
             membershipData = null;
@@ -740,12 +932,10 @@
             document.getElementById('barcodeInput').focus();
         }
 
-        // Format rupiah
         function formatRupiah(angka) {
             return new Intl.NumberFormat('id-ID').format(angka);
         }
 
-        // Auto focus pada load
         window.onload = function () {
             document.getElementById('barcodeInput').focus();
         };
