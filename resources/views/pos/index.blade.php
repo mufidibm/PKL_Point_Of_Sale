@@ -14,7 +14,9 @@
                         <div class="mb-4">
                             <label class="form-label fw-bold">Scan Barcode / Cari Produk</label>
                             <div class="input-group input-group-lg">
-                                <span class="input-group-text bg-white" style="cursor: pointer;" onclick="bukaModalScanner()">
+                                <span class="input-group-text bg-white"
+                                      style="cursor: pointer;"
+                                      onclick="bukaModalScanner()">
                                     <i class="fas fa-barcode text-primary"></i>
                                 </span>
                                 <input type="text"
@@ -27,7 +29,8 @@
                                     <i class="fas fa-search me-1"></i> Cari
                                 </button>
                             </div>
-                            <small class="text-muted"><i class="fas fa-info-circle"></i> Klik icon barcode untuk scan dengan kamera atau tekan Enter untuk cari</small>
+                            <small class="text-muted"><i class="fas fa-info-circle"></i> Klik icon barcode untuk scan dengan
+                                kamera atau tekan Enter untuk cari</small>
 
                             <div id="hasilPencarian"
                                  class="list-group position-absolute"
@@ -195,29 +198,43 @@
     </div>
 
     <!-- Modal Barcode Scanner -->
-    <div class="modal fade" id="modalScanner" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal fade"
+         id="modalScanner"
+         tabindex="-1"
+         data-bs-backdrop="static"
+         data-bs-keyboard="false">
         <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content">
                 <div class="modal-header bg-primary text-white">
                     <h5 class="modal-title">
                         <i class="fas fa-camera me-2"></i>Scan Barcode Produk
                     </h5>
-                    <button type="button" class="btn-close btn-close-white" onclick="tutupModalScanner()"></button>
+                    <button type="button"
+                            class="btn-close btn-close-white"
+                            onclick="tutupModalScanner()"></button>
                 </div>
                 <div class="modal-body">
                     <!-- Pilih Kamera -->
-                    <div class="mb-3" id="pilihanKamera" style="display: none;">
+                    <div class="mb-3"
+                         id="pilihanKamera"
+                         style="display: none;">
                         <label class="form-label fw-bold">Pilih Kamera:</label>
-                        <select class="form-select" id="selectKamera" onchange="gantiKamera()">
+                        <select class="form-select"
+                                id="selectKamera"
+                                onchange="gantiKamera()">
                             <option value="">Memuat daftar kamera...</option>
                         </select>
                     </div>
 
                     <!-- Video Preview -->
                     <div class="text-center mb-3">
-                        <video id="videoPreview" width="100%" style="max-height: 400px; border-radius: 8px; background: #000;"></video>
-                        <div id="scannerLoading" class="mt-3">
-                            <div class="spinner-border text-primary" role="status">
+                        <video id="videoPreview"
+                               width="100%"
+                               style="max-height: 400px; border-radius: 8px; background: #000;"></video>
+                        <div id="scannerLoading"
+                             class="mt-3">
+                            <div class="spinner-border text-primary"
+                                 role="status">
                                 <span class="visually-hidden">Loading...</span>
                             </div>
                             <p class="mt-2">Memuat kamera...</p>
@@ -225,7 +242,9 @@
                     </div>
 
                     <!-- Status Scan -->
-                    <div id="statusScan" class="alert alert-info text-center" style="display: none;">
+                    <div id="statusScan"
+                         class="alert alert-info text-center"
+                         style="display: none;">
                         <i class="fas fa-spinner fa-spin me-2"></i>
                         <span id="statusText">Siap untuk scan...</span>
                     </div>
@@ -234,25 +253,30 @@
                     <div class="mb-3">
                         <label class="form-label fw-bold">Atau Masukkan Barcode Manual:</label>
                         <div class="input-group">
-                            <input type="text" 
-                                   id="barcodeManualInput" 
-                                   class="form-control" 
+                            <input type="text"
+                                   id="barcodeManualInput"
+                                   class="form-control"
                                    placeholder="Ketik kode barcode..."
                                    onkeypress="if(event.key==='Enter') cariProdukDariBarcode()">
-                            <button class="btn btn-primary" onclick="cariProdukDariBarcode()">
+                            <button class="btn btn-primary"
+                                    onclick="cariProdukDariBarcode()">
                                 <i class="fas fa-search me-1"></i> Cari
                             </button>
                         </div>
                     </div>
 
                     <!-- Hasil Scan Terakhir -->
-                    <div id="hasilScanTerakhir" class="alert alert-success" style="display: none;">
+                    <div id="hasilScanTerakhir"
+                         class="alert alert-success"
+                         style="display: none;">
                         <i class="fas fa-check-circle me-2"></i>
                         <strong>Berhasil!</strong> Produk ditambahkan ke keranjang
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" onclick="tutupModalScanner()">
+                    <button type="button"
+                            class="btn btn-secondary"
+                            onclick="tutupModalScanner()">
                         <i class="fas fa-times me-1"></i> Tutup
                     </button>
                 </div>
@@ -278,7 +302,10 @@
             </div>
         </div>
     </div>
-
+    <!-- Sound Beep untuk scan berhasil -->
+    <audio id="beepSound"
+           src="{{ asset('sounds/beep.mp3') }}"
+           preload="auto"></audio>
     <style>
         #barcodeInput {
             font-size: 1.1rem;
@@ -420,7 +447,7 @@
         function bukaModalScanner() {
             const modal = new bootstrap.Modal(document.getElementById('modalScanner'));
             modal.show();
-            
+
             setTimeout(() => {
                 initScanner();
             }, 500);
@@ -440,11 +467,11 @@
             try {
                 document.getElementById('scannerLoading').style.display = 'block';
                 document.getElementById('videoPreview').classList.remove('active');
-                
+
                 codeReader = new ZXing.BrowserMultiFormatReader();
-                
+
                 videoInputDevices = await codeReader.listVideoInputDevices();
-                
+
                 if (videoInputDevices.length === 0) {
                     throw new Error('Tidak ada kamera yang terdeteksi');
                 }
@@ -453,52 +480,52 @@
                 if (videoInputDevices.length > 1) {
                     const selectKamera = document.getElementById('selectKamera');
                     selectKamera.innerHTML = '';
-                    
+
                     videoInputDevices.forEach((device, index) => {
                         const option = document.createElement('option');
                         option.value = device.deviceId;
                         option.text = device.label || `Kamera ${index + 1}`;
                         selectKamera.appendChild(option);
                     });
-                    
+
                     document.getElementById('pilihanKamera').style.display = 'block';
                 }
 
                 selectedDeviceId = videoInputDevices[0].deviceId;
-                
+
                 document.getElementById('scannerLoading').style.display = 'none';
                 document.getElementById('videoPreview').classList.add('active');
                 document.getElementById('statusScan').style.display = 'block';
                 document.getElementById('statusText').textContent = 'Arahkan barcode ke kamera...';
-                
+
                 scannerAktif = true;
-                
+
                 codeReader.decodeFromVideoDevice(selectedDeviceId, 'videoPreview', (result, err) => {
                     if (result) {
                         handleBarcodeScan(result.text);
                     }
                 });
-                
+
             } catch (err) {
                 console.error('Error scanner:', err);
                 document.getElementById('scannerLoading').innerHTML = `
-                    <div class="alert alert-danger">
-                        <i class="fas fa-exclamation-triangle me-2"></i>
-                        Gagal mengakses kamera: ${err.message}
-                        <br><small>Silakan gunakan input manual di bawah</small>
-                    </div>
-                `;
+                                <div class="alert alert-danger">
+                                    <i class="fas fa-exclamation-triangle me-2"></i>
+                                    Gagal mengakses kamera: ${err.message}
+                                    <br><small>Silakan gunakan input manual di bawah</small>
+                                </div>
+                            `;
             }
         }
 
         function gantiKamera() {
             const selectKamera = document.getElementById('selectKamera');
             selectedDeviceId = selectKamera.value;
-            
+
             if (codeReader && selectedDeviceId) {
                 // Stop scanner yang lama
                 codeReader.reset();
-                
+
                 // Start dengan kamera baru
                 scannerAktif = true;
                 codeReader.decodeFromVideoDevice(selectedDeviceId, 'videoPreview', (result, err) => {
@@ -522,41 +549,44 @@
 
         function handleBarcodeScan(barcode) {
             const now = Date.now();
-            
+
             // Cek cooldown
             if (now - lastScanTime < SCAN_COOLDOWN) {
                 return;
             }
-            
+
             lastScanTime = now;
-            
+
             document.getElementById('statusText').textContent = 'Memproses barcode: ' + barcode;
-            
+
             // Cari produk berdasarkan barcode
             fetch(`/pos/cari-produk?keyword=${encodeURIComponent(barcode)}`)
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
                         const produk = Array.isArray(data.data) ? data.data[0] : data.data;
-                        
-                        // Set qty ke 1
-                        const produkDenganQty1 = {...produk, forceQty: 1};
+
+                        const produkDenganQty1 = { ...produk, forceQty: 1 };
                         tambahKeKeranjang(produkDenganQty1);
-                        
+
+                        // === TAMBAHKAN INI: Mainkan suara beep ===
+                        playBeep();
+
                         // Tampilkan notifikasi sukses
                         document.getElementById('hasilScanTerakhir').style.display = 'block';
                         document.getElementById('hasilScanTerakhir').innerHTML = `
-                            <i class="fas fa-check-circle me-2"></i>
-                            <strong>Berhasil!</strong> ${produk.nama_produk} ditambahkan (Qty: 1)
-                        `;
-                        
-                        // Auto hide notifikasi setelah 2 detik
+            <i class="fas fa-check-circle me-2"></i>
+            <strong>Berhasil!</strong> ${produk.nama_produk} ditambahkan (Qty: 1)
+        `;
+
+                        // Auto hide setelah 2 detik
                         setTimeout(() => {
                             document.getElementById('hasilScanTerakhir').style.display = 'none';
                         }, 2000);
-                        
+
                         document.getElementById('statusText').textContent = 'Siap scan barcode berikutnya...';
                     } else {
+                        // produk tidak ditemukan → tidak ada beep
                         document.getElementById('statusText').textContent = 'Produk tidak ditemukan!';
                         setTimeout(() => {
                             document.getElementById('statusText').textContent = 'Arahkan barcode ke kamera...';
@@ -575,7 +605,7 @@
                 alert('Masukkan kode barcode terlebih dahulu');
                 return;
             }
-            
+
             handleBarcodeScan(barcode);
             document.getElementById('barcodeManualInput').value = '';
         }
@@ -594,29 +624,29 @@
                         dataArray.forEach(produk => {
                             const stokClass = produk.stok > 0 ? 'text-success' : 'text-danger';
                             html += `
-                            <a href="#" class="list-group-item list-group-item-action" onclick='pilihProduk(${JSON.stringify(produk)}); return false;'>
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <strong>${produk.nama_produk}</strong>
-                                        ${produk.barcode ? `<br><small class="text-muted">Barcode: ${produk.barcode}</small>` : ''}
-                                        <br><small class="${stokClass}"><i class="fas fa-box"></i> Stok: ${produk.stok}</small>
-                                    </div>
-                                    <div class="text-end">
-                                        <strong class="text-primary">Rp ${formatRupiah(produk.harga_jual)}</strong>
-                                    </div>
-                                </div>
-                            </a>
-                        `;
+                                        <a href="#" class="list-group-item list-group-item-action" onclick='pilihProduk(${JSON.stringify(produk)}); return false;'>
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <div>
+                                                    <strong>${produk.nama_produk}</strong>
+                                                    ${produk.barcode ? `<br><small class="text-muted">Barcode: ${produk.barcode}</small>` : ''}
+                                                    <br><small class="${stokClass}"><i class="fas fa-box"></i> Stok: ${produk.stok}</small>
+                                                </div>
+                                                <div class="text-end">
+                                                    <strong class="text-primary">Rp ${formatRupiah(produk.harga_jual)}</strong>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    `;
                         });
 
                         hasil.innerHTML = html;
                         hasil.style.display = 'block';
                     } else {
                         hasil.innerHTML = `
-                        <div class="list-group-item text-center text-muted">
-                            <i class="fas fa-search"></i> ${data.message}
-                        </div>
-                    `;
+                                    <div class="list-group-item text-center text-muted">
+                                        <i class="fas fa-search"></i> ${data.message}
+                                    </div>
+                                `;
                         hasil.style.display = 'block';
                     }
                 })
@@ -639,27 +669,27 @@
 
                         dataArray.forEach(member => {
                             html += `
-                            <a href="#" class="list-group-item list-group-item-action" onclick='pilihMembership(${JSON.stringify(member)}); return false;'>
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <strong>${member.nama}</strong>
-                                    </div>
-                                    <div>
-                                        <span class="badge bg-success">Diskon ${member.diskon_persen}%</span>
-                                    </div>
-                                </div>
-                            </a>
-                        `;
+                                        <a href="#" class="list-group-item list-group-item-action" onclick='pilihMembership(${JSON.stringify(member)}); return false;'>
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <div>
+                                                    <strong>${member.nama}</strong>
+                                                </div>
+                                                <div>
+                                                    <span class="badge bg-success">Diskon ${member.diskon_persen}%</span>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    `;
                         });
 
                         hasil.innerHTML = html;
                         hasil.style.display = 'block';
                     } else {
                         hasil.innerHTML = `
-                        <div class="list-group-item text-center text-muted">
-                            <i class="fas fa-search"></i> ${data.message}
-                        </div>
-                    `;
+                                    <div class="list-group-item text-center text-muted">
+                                        <i class="fas fa-search"></i> ${data.message}
+                                    </div>
+                                `;
                         hasil.style.display = 'block';
                     }
                 })
@@ -746,14 +776,14 @@
 
             if (keranjang.length === 0) {
                 tbody.innerHTML = `
-                <tr>
-                    <td colspan="6" class="text-center text-muted py-5">
-                        <i class="fas fa-shopping-basket fa-4x mb-3 d-block"></i>
-                        <h5>Keranjang masih kosong</h5>
-                        <p class="mb-0">Scan barcode untuk menambah produk</p>
-                    </td>
-                </tr>
-            `;
+                            <tr>
+                                <td colspan="6" class="text-center text-muted py-5">
+                                    <i class="fas fa-shopping-basket fa-4x mb-3 d-block"></i>
+                                    <h5>Keranjang masih kosong</h5>
+                                    <p class="mb-0">Scan barcode untuk menambah produk</p>
+                                </td>
+                            </tr>
+                        `;
                 return;
             }
 
@@ -761,33 +791,33 @@
             keranjang.forEach((item, index) => {
                 const subtotal = item.harga * item.qty;
                 html += `
-                <tr>
-                    <td class="text-center">${index + 1}</td>
-                    <td>
-                        <strong>${item.nama}</strong>
-                        <br><small class="text-muted">Stok: ${item.stok}</small>
-                    </td>
-                    <td class="text-end">Rp ${formatRupiah(item.harga)}</td>
-                    <td>
-                        <div class="input-group input-group-sm justify-content-center">
-                            <button class="btn btn-outline-secondary btn-qty" onclick="ubahQty(${index}, -1)">
-                                <i class="fas fa-minus"></i>
-                            </button>
-                            <input type="number" class="form-control qty-input" value="${item.qty}" 
-                                   onchange="setQty(${index}, this.value)" min="1" max="${item.stok}">
-                            <button class="btn btn-outline-secondary btn-qty" onclick="ubahQty(${index}, 1)">
-                                <i class="fas fa-plus"></i>
-                            </button>
-                        </div>
-                    </td>
-                    <td class="text-end fw-bold">Rp ${formatRupiah(subtotal)}</td>
-                    <td class="text-center">
-                        <button class="btn btn-sm btn-danger" onclick="hapusItem(${index})" title="Hapus">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </td>
-                </tr>
-            `;
+                            <tr>
+                                <td class="text-center">${index + 1}</td>
+                                <td>
+                                    <strong>${item.nama}</strong>
+                                    <br><small class="text-muted">Stok: ${item.stok}</small>
+                                </td>
+                                <td class="text-end">Rp ${formatRupiah(item.harga)}</td>
+                                <td>
+                                    <div class="input-group input-group-sm justify-content-center">
+                                        <button class="btn btn-outline-secondary btn-qty" onclick="ubahQty(${index}, -1)">
+                                            <i class="fas fa-minus"></i>
+                                        </button>
+                                        <input type="number" class="form-control qty-input" value="${item.qty}" 
+                                               onchange="setQty(${index}, this.value)" min="1" max="${item.stok}">
+                                        <button class="btn btn-outline-secondary btn-qty" onclick="ubahQty(${index}, 1)">
+                                            <i class="fas fa-plus"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                                <td class="text-end fw-bold">Rp ${formatRupiah(subtotal)}</td>
+                                <td class="text-center">
+                                    <button class="btn btn-sm btn-danger" onclick="hapusItem(${index})" title="Hapus">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        `;
             });
 
             tbody.innerHTML = html;
@@ -981,5 +1011,14 @@
         window.onload = function () {
             document.getElementById('barcodeInput').focus();
         };
+
+        function playBeep() {
+            const beep = document.getElementById('beepSound');
+            beep.currentTime = 0; // reset ke awal agar bisa diputar berulang kali
+            beep.play().catch(e => {
+                console.warn('Gagal memutar suara beep:', e);
+                // Kadang browser blokir autoplay jika tidak ada interaksi user sebelumnya
+            });
+        }
     </script>
 @endsection
