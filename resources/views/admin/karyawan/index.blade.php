@@ -4,10 +4,6 @@
 @section('content')
 <div class="container-fluid">
 
-    @if(session('success'))
-        <div class="alert alert-success">{{ session('success') }}</div>
-    @endif
-
     <a href="{{ route('karyawan.create') }}" class="btn btn-primary mb-3">+ Tambah Karyawan</a>
 
     <div class="card">
@@ -19,7 +15,7 @@
                         <th>Nama</th>
                         <th>Jabatan</th>
                         <th>No. Telepon</th>
-                        <th>User</th>
+                        {{-- <th>User</th> --}}
                         <th>Aksi</th>
                     </tr>
                 </thead>
@@ -30,7 +26,7 @@
                             <td>{{ $karyawan->nama }}</td>
                             <td>{{ $karyawan->jabatan }}</td>
                             <td>{{ $karyawan->no_telepon }}</td>
-                            <td>{{ $karyawan->user?->name ?? '-' }}</td>
+                            {{-- <td>{{ $karyawan->user?->name ?? '-' }}</td> --}}
                             <td>
                                 <a href="{{ route('karyawan.edit', $karyawan->id) }}" class="btn btn-warning btn-sm">Edit</a>
                                 <form action="{{ route('karyawan.destroy', $karyawan->id) }}" method="POST" class="d-inline"

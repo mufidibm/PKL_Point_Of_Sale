@@ -52,11 +52,16 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/settings', [SettingController::class, 'index'])->name('settings.index');
     Route::post('/settings', [SettingController::class, 'update'])->name('settings.update');
     Route::delete('/settings/delete-logo', [SettingController::class, 'deleteLogo'])->name('settings.delete-logo');
+
+    // Transaksi
+// routes/web.php
+Route::resource('penjualan', TransaksiPenjualanController::class)->parameters([
+    'penjualan' => 'transaksiPenjualan'
+]);
+Route::resource('pembelian', TransaksiPembelianController::class);
 });
 
-// Transaksi
-Route::resource('penjualan', TransaksiPenjualanController::class);
-Route::resource('pembelian', TransaksiPembelianController::class);
+
 
 // Retur
 Route::resource('retur-penjualan', ReturPenjualanController::class);

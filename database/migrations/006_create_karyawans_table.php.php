@@ -11,7 +11,7 @@ return new class extends Migration {
             $table->string('nama');
             $table->string('jabatan')->nullable();
             $table->string('no_telepon')->nullable();
-            $table->foreignId('user_id')->unique()->constrained()->cascadeOnDelete();
+            $table->foreignId('user_id')->unique()->constrained()->cascadeOnDelete()->nullable();
             $table->timestamp('created_at')->useCurrent();
             $table->timestamp('updated_at')->useCurrentOnUpdate()->nullable();
         });

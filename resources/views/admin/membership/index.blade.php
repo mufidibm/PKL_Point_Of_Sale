@@ -3,11 +3,6 @@
 
 @section('content')
 <div class="container-fluid">
-
-    @if(session('success'))
-        <div class="alert alert-success">{{ session('success') }}</div>
-    @endif
-
     <a href="{{ route('membership.create') }}" class="btn btn-primary mb-3">+ Tambah Membership</a>
 
     <div class="card">

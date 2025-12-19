@@ -1,10 +1,10 @@
 @extends('layouts.app')
-
+@section('title', 'Edit Transaksi Penjualan')
 @section('content')
 <div class="container-fluid">
-    <h1 class="mb-3">Edit Transaksi Penjualan #{{ $transaksi->no_invoice }}</h1>
+    <h1 class="mb-3">Edit Transaksi Penjualan #{{ $transaksiPenjualan->no_invoice }}</h1>
 
-    <form action="{{ route('penjualan.update', $transaksi->id) }}" method="POST" id="form-penjualan">
+    <form action="{{ route('penjualan.update', $transaksiPenjualan->id) }}" method="POST" id="form-penjualan">
         @csrf @method('PUT')
         <div class="card">
             <div class="card-body">
@@ -34,7 +34,7 @@
                         <select name="karyawan_id" class="form-control" required>
                             <option value="">-- Pilih Karyawan --</option>
                             @foreach($karyawans as $k)
-                                <option value="{{ $k->id }}" {{ $k->id == $transaksi->karyawan_id ? 'selected' : '' }}>
+                                <option value="{{ $k->id }}" {{ $k->id == $transaksiPenjualan->karyawan_id ? 'selected' : '' }}>
                                     {{ $k->nama }}
                                 </option>
                             @endforeach
@@ -43,14 +43,14 @@
                     <div class="col-md-3">
                         <label>Tanggal <span class="text-danger">*</span></label>
                         <input type="date" name="tanggal" class="form-control"
-                               value="{{ old('tanggal', $transaksi->tanggal->format('Y-m-d')) }}" required>
+                               value="{{ old('tanggal', $transaksiPenjualan->tanggal->format('Y-m-d')) }}" required>
                     </div>
                     <div class="col-md-3">
                         <label>Metode Bayar <span class="text-danger">*</span></label>
                         <select name="metode_bayar" class="form-control" required>
-                            <option value="tunai" {{ $transaksi->metode_bayar == 'tunai' ? 'selected' : '' }}>Tunai</option>
-                            <option value="kartu" {{ $transaksi->metode_bayar == 'kartu' ? 'selected' : '' }}>Kartu</option>
-                            <option value="transfer" {{ $transaksi->metode_bayar == 'transfer' ? 'selected' : '' }}>Transfer</option>
+                            <option value="tunai" {{ $transaksiPenjualan->metode_bayar == 'tunai' ? 'selected' : '' }}>Tunai</option>
+                            <option value="kartu" {{ $transaksiPenjualan->metode_bayar == 'kartu' ? 'selected' : '' }}>Kartu</option>
+                            <option value="transfer" {{ $transaksiPenjualan->metode_bayar == 'transfer' ? 'selected' : '' }}>Transfer</option>
                         </select>
                     </div>
                 </div>
@@ -71,7 +71,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach($transaksi->detailPenjualan as $index => $detail)
+                        @foreach($transaksiPenjualan->detailPenjualan as $index => $detail)
                             <tr class="item-row">
                                 <td>
                                     <select name="items[{{ $index }}][produk_id]" class="form-control produk-select" required>
@@ -106,19 +106,19 @@
                     <tfoot>
                         <tr>
                             <td colspan="4" class="text-end"><strong>Subtotal</strong></td>
-                            <td><strong id="subtotal-display">Rp {{ number_format($transaksi->subtotal, 0, ',', '.') }}</strong></td>
+                            <td><strong id="subtotal-display">Rp {{ number_format($transaksiPenjualan->subtotal, 0, ',', '.') }}</strong></td>
                             <td></td>
                         </tr>
                         <tr>
                             <td colspan="4" class="text-end"><strong>Diskon <span id="diskon-persen">0%</span></strong></td>
-                            <td><strong id="diskon-display">Rp {{ number_format($transaksi->diskon, 0, ',', '.') }}</strong></td>
+                            <td><strong id="diskon-display">Rp {{ number_format($transaksiPenjualan->diskon, 0, ',', '.') }}</strong></td>
                             <td></td>
                         </tr>
                         <tr class="table-info">
                             <td colspan="4" class="text-end"><strong>Total Bayar</strong></td>
                             <td>
-                                <strong id="total-display">Rp {{ number_format($transaksi->total_bayar, 0, ',', '.') }}</strong>
-                                <input type="hidden" name="total_bayar" id="total-value" value="{{ $transaksi->total_bayar }}">
+                                <strong id="total-display">Rp {{ number_format($transaksiPenjualan->total_bayar, 0, ',', '.') }}</strong>
+                                <input type="hidden" name="total_bayar" id="total-value" value="{{ $transaksiPenjualan->total_bayar }}">
                             </td>
                             <td></td>
                         </tr>
@@ -141,8 +141,8 @@
 
 @push('scripts')
 <script>
-let index = {{ $transaksi->detailPenjualan->count() }};
-let diskonPersen = {{ $transaksi->pelanggan?->membership?->diskon_persen ?? 0 }};
+let index = {{ $transaksiPenjualan->detailPenjualan->count() }};
+let diskonPersen = {{ $transaksiPenjualan->pelanggan?->membership?->diskon_persen ?? 0 }};
 
 // Init diskon
 document.getElementById('diskon-persen').textContent = diskonPersen + '%';

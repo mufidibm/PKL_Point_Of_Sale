@@ -1,8 +1,7 @@
 @extends('layouts.app')
-
+@section('title', 'Edit Karyawan')
 @section('content')
 <div class="container-fluid">
-    <h1 class="mb-3">Edit Karyawan</h1>
 
     <div class="card">
         <div class="card-body">
@@ -27,7 +26,7 @@
                     @error('no_telepon') <span class="text-danger">{{ $message }}</span> @enderror
                 </div>
 
-                <div class="form-group">
+                {{-- <div class="form-group">
                     <label>User (Opsional)</label>
                     <select name="user_id" class="form-control">
                         <option value="">-- Tidak Ada --</option>
@@ -37,7 +36,7 @@
                             </option>
                         @endforeach
                     </select>
-                </div>
+                </div> --}}
 
                 <button type="submit" class="btn btn-warning">Update</button>
                 <a href="{{ route('karyawan.index') }}" class="btn btn-secondary">Kembali</a>

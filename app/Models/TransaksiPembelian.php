@@ -24,7 +24,7 @@ class TransaksiPembelian extends Model
     ];
 
     // RELASI DIPERBAIKI: GUNAKAN JAMAK
-    public function detailPembelians()
+    public function detailPembelian()
     {
         return $this->hasMany(DetailPembelian::class, 'transaksi_id');
     }

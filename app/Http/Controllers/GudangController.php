@@ -39,7 +39,7 @@ class GudangController extends Controller
     public function update(Request $request, Gudang $gudang)
     {
         $request->validate([
-            'nama_gudang' => 'required|string|max:255|unique:gudang,nama_gudang,' . $gudang->id,
+            'nama_gudang' => 'required|string|max:255|unique:gudangs,nama_gudang,' . $gudang->id,
             'lokasi'      => 'required|string',
         ]);
 

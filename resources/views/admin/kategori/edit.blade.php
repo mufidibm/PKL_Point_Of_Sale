@@ -1,8 +1,7 @@
 @extends('layouts.app')
-
+@section('title', 'Edit Kategori')
 @section('content')
 <div class="container-fluid">
-    <h1 class="mb-3">Edit Kategori</h1>
 
     <form action="{{ route('kategori.update', $kategori->id) }}" method="POST">
         @csrf

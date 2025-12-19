@@ -1,8 +1,7 @@
 @extends('layouts.app')
-
+@section('title', 'Tambah Kategori')
 @section('content')
 <div class="container-fluid">
-    <h1 class="mb-3">Tambah Kategori</h1>
 
     <form action="{{ route('kategori.store') }}" method="POST">
         @csrf

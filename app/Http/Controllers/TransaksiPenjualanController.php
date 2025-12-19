@@ -24,7 +24,8 @@ class TransaksiPenjualanController extends Controller
     $pelanggans = Pelanggan::with('membership')->get();
     $karyawans = Karyawan::all();
     $produks = Produk::with('stokGudang')->get();
-    $pelangganUmum = Pelanggan::where('nama', 'Umum')->firstOrFail(); // tambah ini
+    $pelangganUmum = Pelanggan::where('nama', 'Umum')->first() 
+    ?? Pelanggan::create(['nama' => 'Umum']); // otomatis buat kalau belum ada
 
     return view('admin.transaksi.penjualan.create', compact(
         'pelanggans', 'karyawans', 'produks', 'pelangganUmum'
@@ -172,9 +173,9 @@ public function update(Request $request, TransaksiPenjualan $transaksiPenjualan)
         ->with('success', 'Transaksi penjualan berhasil diperbarui.');
 }
 
-    public function show(TransaksiPenjualan $penjualan)
+public function show(TransaksiPenjualan $transaksiPenjualan)
 {
-    $penjualan->load('detailPenjualan.produk', 'pelanggan.membership', 'karyawan');
-    return view('admin.transaksi.penjualan.show', compact('penjualan'));
+    $transaksiPenjualan->load('detailPenjualan.produk', 'pelanggan.membership', 'karyawan');
+    return view('admin.transaksi.penjualan.show', compact('transaksiPenjualan'));
 }
 }

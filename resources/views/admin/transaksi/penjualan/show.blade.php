@@ -1,24 +1,9 @@
-@extends('layouts.admin')
+@extends('layouts.app')
 
 @section('title', 'Detail Transaksi Penjualan')
 
 @section('content')
-<div class="content-header">
-    <div class="container-fluid">
-        <div class="row mb-2">
-            <div class="col-sm-6">
-                <h1 class="m-0">Detail Transaksi Penjualan</h1>
-            </div>
-            <div class="col-sm-6">
-                <ol class="breadcrumb float-sm-right">
-                    <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Home</a></li>
-                    <li class="breadcrumb-item"><a href="{{ route('transaksi.penjualan.index') }}">Transaksi Penjualan</a></li>
-                    <li class="breadcrumb-item active">Detail</li>
-                </ol>
-            </div>
-        </div>
-    </div>
-</div>
+
 
 <section class="content">
     <div class="container-fluid">
@@ -26,12 +11,12 @@
             <div class="col-12">
                 <div class="card">
                     <div class="card-header">
-                        <h3 class="card-title">Invoice #{{ $penjualan->id }}</h3>
+                        <h3 class="card-title">Invoice #{{$transaksiPenjualan->id }}</h3>
                         <div class="card-tools">
-                            <a href="{{ route('transaksi.penjualan.index') }}" class="btn btn-sm btn-secondary">
+                            <a href="{{ route('penjualan.index') }}" class="btn btn-sm btn-secondary">
                                 <i class="fas fa-arrow-left"></i> Kembali
                             </a>
-                            <a href="{{ route('transaksi.penjualan.edit', $penjualan->id) }}" class="btn btn-sm btn-warning">
+                            <a href="{{ route('penjualan.edit',$transaksiPenjualan->id) }}" class="btn btn-sm btn-warning">
                                 <i class="fas fa-edit"></i> Edit
                             </a>
                             <button onclick="window.print()" class="btn btn-sm btn-info">
@@ -47,21 +32,21 @@
                                 <table class="table table-sm table-borderless">
                                     <tr>
                                         <td width="150"><strong>No. Transaksi</strong></td>
-                                        <td>: {{ $penjualan->id }}</td>
+                                        <td>: {{$transaksiPenjualan->id }}</td>
                                     </tr>
                                     <tr>
                                         <td><strong>Tanggal</strong></td>
-                                        <td>: {{ \Carbon\Carbon::parse($penjualan->tanggal)->format('d/m/Y H:i') }}</td>
+                                        <td>: {{ \Carbon\Carbon::parse($transaksiPenjualan->tanggal)->format('d/m/Y H:i') }}</td>
                                     </tr>
                                     <tr>
                                         <td><strong>Kasir</strong></td>
-                                        <td>: {{ $penjualan->karyawan->nama ?? '-' }}</td>
+                                        <td>: {{$transaksiPenjualan->karyawan->nama ?? '-' }}</td>
                                     </tr>
                                     <tr>
                                         <td><strong>Metode Bayar</strong></td>
                                         <td>: 
-                                            <span class="badge badge-{{ $penjualan->metode_bayar == 'tunai' ? 'success' : ($penjualan->metode_bayar == 'kartu' ? 'primary' : 'info') }}">
-                                                {{ strtoupper($penjualan->metode_bayar) }}
+                                            <span class="badge badge-{{$transaksiPenjualan->metode_bayar == 'tunai' ? 'success' : ($transaksiPenjualan->metode_bayar == 'kartu' ? 'primary' : 'info') }}">
+                                                {{ strtoupper($transaksiPenjualan->metode_bayar) }}
                                             </span>
                                         </td>
                                     </tr>
@@ -72,18 +57,18 @@
                                 <table class="table table-sm table-borderless">
                                     <tr>
                                         <td width="150"><strong>Nama</strong></td>
-                                        <td>: {{ $penjualan->pelanggan->nama ?? 'Umum' }}</td>
+                                        <td>: {{$transaksiPenjualan->pelanggan->nama ?? 'Umum' }}</td>
                                     </tr>
                                     <tr>
                                         <td><strong>No. Telepon</strong></td>
-                                        <td>: {{ $penjualan->pelanggan->no_telp ?? '-' }}</td>
+                                        <td>: {{$transaksiPenjualan->pelanggan->no_telp ?? '-' }}</td>
                                     </tr>
                                     <tr>
                                         <td><strong>Membership</strong></td>
                                         <td>: 
-                                            @if($penjualan->pelanggan && $penjualan->pelanggan->membership)
+                                            @if($transaksiPenjualan->pelanggan &&$transaksiPenjualan->pelanggan->membership)
                                                 <span class="badge badge-primary">
-                                                    {{ $penjualan->pelanggan->membership->nama_membership }}
+                                                    {{$transaksiPenjualan->pelanggan->membership->nama_membership }}
                                                 </span>
                                             @else
                                                 <span class="badge badge-secondary">Non Member</span>
@@ -92,7 +77,7 @@
                                     </tr>
                                     <tr>
                                         <td><strong>Diskon Member</strong></td>
-                                        <td>: {{ $penjualan->pelanggan?->membership?->diskon_persen ?? 0 }}%</td>
+                                        <td>: {{$transaksiPenjualan->pelanggan?->membership?->diskon_persen ?? 0 }}%</td>
                                     </tr>
                                 </table>
                             </div>
@@ -114,7 +99,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @forelse($penjualan->detailPenjualan as $index => $detail)
+                                    @forelse($transaksiPenjualan->detailPenjualan as $index => $detail)
                                     <tr>
                                         <td class="text-center">{{ $index + 1 }}</td>
                                         <td>{{ $detail->produk->nama_produk ?? '-' }}</td>
@@ -141,19 +126,19 @@
                                     <tr>
                                         <td class="text-right"><strong>Subtotal:</strong></td>
                                         <td class="text-right" width="200">
-                                            <strong>Rp {{ number_format($penjualan->subtotal, 0, ',', '.') }}</strong>
+                                            <strong>Rp {{ number_format($transaksiPenjualan->subtotal, 0, ',', '.') }}</strong>
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td class="text-right"><strong>Diskon ({{ $penjualan->pelanggan?->membership?->diskon_persen ?? 0 }}%):</strong></td>
+                                        <td class="text-right"><strong>Diskon ({{$transaksiPenjualan->pelanggan?->membership?->diskon_persen ?? 0 }}%):</strong></td>
                                         <td class="text-right text-danger">
-                                            <strong>- Rp {{ number_format($penjualan->diskon, 0, ',', '.') }}</strong>
+                                            <strong>- Rp {{ number_format($transaksiPenjualan->diskon, 0, ',', '.') }}</strong>
                                         </td>
                                     </tr>
                                     <tr class="bg-light">
                                         <td class="text-right"><h5><strong>Total Bayar:</strong></h5></td>
                                         <td class="text-right">
-                                            <h5><strong>Rp {{ number_format($penjualan->total_bayar, 0, ',', '.') }}</strong></h5>
+                                            <h5><strong>Rp {{ number_format($transaksiPenjualan->total_bayar, 0, ',', '.') }}</strong></h5>
                                         </td>
                                     </tr>
                                 </table>

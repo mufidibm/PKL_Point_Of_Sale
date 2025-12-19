@@ -1,9 +1,7 @@
 @extends('layouts.app')
-
+@section('title', 'Edit Membership')
 @section('content')
 <div class="container-fluid">
-    <h1 class="mb-3">Edit Membership</h1>
-
     <div class="card">
         <div class="card-body">
             <form action="{{ route('membership.update', $membership->id) }}" method="POST">

@@ -1,8 +1,7 @@
 @extends('layouts.app')
-
+@section('title', 'Transaksi Penjualan Baru')
 @section('content')
-<div class="container-fluid">
-    <h1 class="mb-3">Transaksi Penjualan Baru</h1>
+<div class="container-fluid">   
 
     <form action="{{ route('penjualan.store') }}" method="POST" id="form-penjualan">
         @csrf

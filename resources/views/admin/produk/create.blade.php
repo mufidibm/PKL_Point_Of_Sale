@@ -1,8 +1,7 @@
 @extends('layouts.app')
-
+@section('title', 'Tambah Produk')
 @section('content')
 <div class="container-fluid">
-    <h1 class="mb-3">Tambah Produk</h1>
 
     <div class="card">
         <div class="card-body">
